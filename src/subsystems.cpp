@@ -2,52 +2,57 @@
 
 // Internal targets to aid tasks
 Colors allianceColor = NEUTRAL;
-int firstTarget = 0;
-int secondTarget = 0;
-int indexerTarget = 0;
+int frontTarget = 0;
+int backTarget = 0;
 bool inputLock = false;
 bool jamDelay = false;
 
 // Complex motors
-Jammable none = Jammable(&intakeNone, &secondTarget, 20, 50, 50, false, false);
-Jammable first = Jammable(&intakeFirst, &firstTarget, 20, 50, 60, true, false);
-Jammable second = Jammable(&intakeSecond, &secondTarget, 20, 50, 50, false, false);
-Jammable indexer = Jammable(&intakeIndexer, &indexerTarget, 40, 5, 55, false, false);
+Jammable none = Jammable({&intakeNone}, &frontTarget, 20, 50, 50, false, false);
+Jammable front = Jammable({&intakeFront}, &frontTarget, 20, 50, 60, true, false);
+Jammable back = Jammable({&intakeBack}, &backTarget, 20, 50, 50, false, false);
 
-Jammable* targetMotor = &indexer;
+Jammable* targetMotor = &back;
 
 //
 // Wrappers & Utility functions
 //
 
-void setIntake(int first_speed, int second_speed, int third_speed, bool redirect_up) {
+void setIntake(int first_speed, int second_speed, bool indexer_up, bool redirect_up) {
 	if(autonMode != BRAIN) {
-		if(first.lock != true) {
-			first.motor->move(first_speed);
-		}
-		if(second.lock != true) {
-			second.motor->move(second_speed);
-		}
-		if(indexer.lock != true) {
-			indexer.motor->move(third_speed);
-		}
-		if(inputLock) targetMotor->motor->move(-*targetMotor->target);
+		indexer.set(indexer_up);
 		redirect.set(redirect_up);
-		firstTarget = first_speed;
-		secondTarget = second_speed;
-		indexerTarget = third_speed;
+		setIntake(first_speed, second_speed);
 	}
 }
 
-void setIntake(int first_speed, int second_speed, int third_speed) { setIntake(first_speed, second_speed, third_speed, false); }
+void setIntake(int first_speed, int second_speed, bool redirect_up) {
+	if(autonMode != BRAIN) {
+		redirect.set(redirect_up);
+		setIntake(first_speed, second_speed);
+	}
+}
 
-void setIntake(int intake_speed, int outtake_speed, bool redirect_up) { setIntake(intake_speed, intake_speed, outtake_speed, redirect_up); }
-
-void setIntake(int intake_speed, int outtake_speed) { setIntake(intake_speed, intake_speed, outtake_speed, false); }
-
-void setIntake(int speed, bool redirect_up) { setIntake(speed, speed, speed, redirect_up); }
-
-void setIntake(int speed) { setIntake(speed, speed, speed, false); }
+void setIntake(int first_speed, int second_speed) {
+	if(autonMode != BRAIN) {
+		if(front.lock != true) {
+			for(auto motor : front.motors) {
+				motor->move(first_speed);
+			}
+		}
+		if(back.lock != true) {
+			for(auto motor : back.motors) {
+				motor->move(second_speed);
+			}
+			if(inputLock)
+				for(auto motor : targetMotor->motors) {
+					motor->move(-*targetMotor->target);
+				}
+			frontTarget = first_speed;
+			backTarget = second_speed;
+		}
+	}
+}
 
 void setScraper(bool state) {
 	if(autonMode != BRAIN) {
@@ -83,39 +88,27 @@ void setIntakeOp() {
 		jamDelay = true;
 	if(shift()) {
 		if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {	 // short score
-			setIntake(127, true);
-			targetMotor = &indexer;
+			setIntake(127, -127, true, false);
 		} else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {	// low goal evil scoring
-			setIntake(-127, -127, 127, false);
-			targetMotor = &first;
+			setIntake(-127, -127);
 		} else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {	// mid goal scoring
-			setIntake(110, -90, -30, false);
-			targetMotor = &first;
+			setIntake(90, 90, false, true);
 		} else {
-			targetMotor = &none;
-			setIntake(0);
-			first.lock = false;
-			second.lock = false;
-			indexer.lock = false;
+			setIntake(0, 0, false);
+			front.lock = false;
+			back.lock = false;
 		}
 	} else {
 		if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {	 // storing
-			setIntake(127, false);
-			targetMotor = &indexer;
-		} else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {	// low goal safe scoring
-			setIntake(-70, -100, 127, false);
-			targetMotor = &first;
-			first.limit = 5;
+			setIntake(127, 127, true, false);
+		} else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {	// low goal
+			setIntake(-90, -90);
 		} else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {	// top goal scoring
-			setIntake(127, -127, 127, true);
-			targetMotor = &second;
+			setIntake(127, 127, false, true);
 		} else {
-			targetMotor = &none;
-			setIntake(0);
-			first.limit = 20;
-			first.lock = false;
-			second.lock = false;
-			indexer.lock = false;
+			setIntake(0, 0, false);
+			front.lock = false;
+			back.lock = false;
 		}
 	}
 
@@ -189,12 +182,16 @@ void colorTask() {
 			if(colorCompare(color) && !sleep) {
 				if(sortTime < 10) {
 					inputLock = true;
-					targetMotor->motor->move((-*targetMotor->target));
+					for(auto motor : targetMotor->motors) {
+						motor->move((-*targetMotor->target));
+					}
 					sortTime++;
 					pros::delay(180);
 				} else {
 					sleep = true;
-					targetMotor->motor->move(*targetMotor->target);
+					for(auto motor : targetMotor->motors) {
+						motor->move(*targetMotor->target);
+					}
 				}
 			} else {
 				sortTime = 0;
@@ -211,42 +208,46 @@ void colorTask() {
 //
 
 void Jammable::checkJam() {
-	if(this->motor->get_temperature() > this->maxTemp) {
-		// cout << "Temperature too high: " << this->motor->get_temperature() << "
-		// °C\n";
-		return;
+	double currentTemp = 0.0;
+	double currentVelocity = 0.0;
+	int it = 0;
+
+	for(auto motor : this->motors) {
+		currentTemp += motor->get_temperature();
+		currentVelocity += motor->get_actual_velocity();
+		it++;
 	}
 
-	if(this->ignoreSort == false && inputLock == true) {
-		// cout << "Input locked\n";
-		return;
-	}
+	currentTemp /= it;
+	currentVelocity /= it;
 
-	// cout << "target: " << abs(*(this->target)) << ", " << "actual: " <<
-	// this->motor->get_actual_velocity() << " limit: " << this->limit << "\n";
+	if(currentTemp > this->maxTemp) return;
 
-	if(abs(*(this->target)) > 0 && abs(this->motor->get_actual_velocity()) < this->limit) {
+	if(this->ignoreSort == false && inputLock == true) return;
+
+	if(abs(*(this->target)) > 0 && abs(currentVelocity) < this->limit) {
 		this->clock++;
-		// cout << this->clock << "\n";
 		if(this->clock > this->attempts) {
 			if(this->pause) {
 				this->lock = true;
-				this->motor->move(0);
-				// cout << "Paused\n";
+				for(auto motor : this->motors) {
+					motor->move(0);
+				}
 			} else {
 				this->lock = true;
-				this->motor->move(-(*(this->target)));
+				for(auto motor : this->motors) {
+					motor->move(-(*(this->target)));
+				}
 				pros::delay(100);
-				this->motor->move(*(this->target));
+				for(auto motor : this->motors) {
+					motor->move(*(this->target));
+				}
 				this->lock = false;
-				// cout << "Unjammed\n";
 			}
 			this->clock = 0;
 		}
-	} else {
+	} else
 		this->clock = 0;
-		// cout << "Jam resolved\n";
-	}
 }
 
 void antiJamTask() {
@@ -255,10 +256,8 @@ void antiJamTask() {
 			pros::delay(200);
 			jamDelay = false;
 		}
-		first.checkJam();
-		second.checkJam();
-		indexer.checkJam();
-		// cout << "====================\n";
+		front.checkJam();
+		back.checkJam();
 		pros::delay(10);
 	}
 }
@@ -367,7 +366,7 @@ void controllerTask() {
 			tempDrive = (chassis.left_motors[0].get_temperature() + chassis.left_motors[1].get_temperature() + chassis.left_motors[2].get_temperature() +
 						 chassis.right_motors[0].get_temperature() + chassis.right_motors[1].get_temperature() + chassis.right_motors[2].get_temperature()) /
 						6;
-			tempIntake = (intakeFirst.get_temperature() + intakeSecond.get_temperature() + intakeIndexer.get_temperature()) / 3;
+			tempIntake = (intakeFront.get_temperature() + intakeSecond.get_temperature() + intakeBack.get_temperature()) / 3;
 
 			if(tempDrive <= 30)
 				pros::c::controller_print(pros::E_CONTROLLER_MASTER, 0, 0, "drive: cool, %.0f°C     ", tempDrive);

@@ -131,9 +131,8 @@ vector<MotorDisp> chassisMotors = {MotorDisp(&chassis.left_motors[0], "front lef
 								   MotorDisp(&chassis.left_motors[2], "back left", lv_color_lighten(pink, 120), 50),
 								   MotorDisp(&chassis.right_motors[2], "back right", lv_color_lighten(violet, 120), 50)};
 
-vector<MotorDisp> intakeMotors = {MotorDisp(&intakeFirst, "first stage", lv_color_lighten(blue, 80), 50),
-								  MotorDisp(&intakeSecond, "second stage", lv_color_lighten(blue, 80), 50),
-								  MotorDisp(&intakeIndexer, "third stage", lv_color_lighten(blue, 80), 50)};
+vector<MotorDisp> intakeMotors = {MotorDisp(&intakeFront, "front stage", lv_color_lighten(blue, 80), 50),
+								  MotorDisp(&intakeBack, "back stage", lv_color_lighten(green, 80), 50)};
 
 MotorTab chassisTabObj = 
 	MotorTab("chassis", theme_color, &chassis.leftPID.error, 24, chassisMotors, drive_test, false,

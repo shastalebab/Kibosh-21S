@@ -99,14 +99,14 @@ void right_split() {
 	pidWait(WAIT);
 	swingSet(LEFT_SWING, -45, 90, -45, ccw);
 	pidWait(WAIT);
-	setIntake(127);
+	//setIntake(127);
 	driveSet(27.75, DRIVE_SPEED);
 	pidWait(WAIT);
 	delayMillis(200);
-	setIntake(-100, -100, 100, false);
+	//setIntake(-100, -100, 100, false);
 	delayMillis(1000);
 	// Grab blocks under long goal
-	setIntake(127);
+	//setIntake(127);
 	swingSet(RIGHT_SWING, 61, SWING_SPEED);
 	pidWait(WAIT);
 	driveSet(28, DRIVE_SPEED);
@@ -130,7 +130,7 @@ void right_split() {
 	pidWait(WAIT);
 	driveSet(18.5, 60);
 	pidWait(WAIT);
-	setIntake(127, -127, 127, true);
+	//setIntake(127, -127, 127, true);
 }
 
 void right_greed() {
@@ -143,7 +143,7 @@ void right_greed() {
 	pidWait(WAIT);
 	driveSet(19, DRIVE_SPEED, true);
 	delayMillis(200);
-	setIntake(127);
+	//setIntake(127);
 	pidWait(WAIT);
 	// Grab blocks under long goal
 	turnSet(61, TURN_SPEED);
@@ -171,7 +171,7 @@ void right_greed() {
 	pidWait(WAIT);
 	driveSet(18.5, 60);
 	pidWait(WAIT);
-	setIntake(127, -127, 127, true);
+	//setIntake(127, -127, 127, true);
 }
 
 void right_awp() {
@@ -181,14 +181,14 @@ void right_awp() {
 	pidWait(WAIT);
 	swingSet(LEFT_SWING, -45, 90, -45, ccw);
 	pidWait(WAIT);
-	setIntake(127);
+	//setIntake(127);
 	driveSet(23.75, DRIVE_SPEED);
 	pidWait(WAIT);
 	delayMillis(200);
-	setIntake(-100, -100, 100, false);
+	//setIntake(-100, -100, 100, false);
 	delayMillis(1000);
 	// Grab blocks on other side of field and score
-	setIntake(127);
+	//setIntake(127);
 	driveSet(-7.75, DRIVE_SPEED, true);
 	pidWait(WAIT);
 	turnSet(-90, TURN_SPEED);
@@ -197,15 +197,15 @@ void right_awp() {
 	pidWaitUntil(28_in);
 	chassis.pid_speed_max_set(60);
 	pidWait(WAIT);
-	setIntake(127, 40, 0, 0);
+	//setIntake(127, 40, 0, 0);
 	turnSet(45, TURN_SPEED);
 	pidWait(WAIT);
 	driveSet(12, DRIVE_SPEED);
-	setIntake(90, 70, -60, false);
+	//setIntake(90, 70, -60, false);
 	pidWait(WAIT);
 	delayMillis(1500);
 	// Align to loader
-	setIntake(127);
+	//setIntake(127);
 	driveSet(-45.5, DRIVE_SPEED, true);
 	pidWait(WAIT);
 	turnSet(180, TURN_SPEED);
@@ -221,7 +221,7 @@ void right_awp() {
 	pidWait(WAIT);
 	driveSet(14, DRIVE_SPEED);
 	pidWait(WAIT);
-	setIntake(127, -127, 127, true);
+	//setIntake(127, -127, 127, true);
 }
 
 //
@@ -238,13 +238,13 @@ void left_split() {
 	pidWait(WAIT);
 	driveSet(27.75, 70, true);
 	delayMillis(200);
-	setIntake(127);
+	//setIntake(127);
 	pidWait(WAIT);
 	delayMillis(1200);
-	setIntake(110, -90, -30, false);
+	//setIntake(110, -90, -30, false);
 	delayMillis(1000);
 	// Grab blocks under long goal
-	setIntake(127);
+	//setIntake(127);
 	swingSet(LEFT_SWING, -61, SWING_SPEED);
 	pidWait(WAIT);
 	driveSet(26, DRIVE_SPEED);
@@ -268,7 +268,7 @@ void left_split() {
 	pidWait(WAIT);
 	driveSet(18.5, 60);
 	pidWait(WAIT);
-	setIntake(127, -127, 127, true);
+	//setIntake(127, -127, 127, true);
 }
 
 void left_greed() {
@@ -281,7 +281,7 @@ void left_greed() {
 	pidWait(WAIT);
 	driveSet(19, DRIVE_SPEED, true);
 	delayMillis(200);
-	setIntake(127);
+	//setIntake(127);
 	pidWait(WAIT);
 	// Grab blocks under long goal
 	turnSet(-61, TURN_SPEED);
@@ -309,7 +309,7 @@ void left_greed() {
 	pidWait(WAIT);
 	driveSet(18.5, 60);
 	pidWait(WAIT);
-	setIntake(127, -127, 127, true);
+	//setIntake(127, -127, 127, true);
 }
 
 void left_awp() {
@@ -319,14 +319,14 @@ void left_awp() {
 	pidWait(WAIT);
 	swingSet(RIGHT_SWING, 45, 90, -45, cw);
 	pidWait(WAIT);
-	setIntake(127);
+	//setIntake(127);
 	driveSet(28.75, 70);
 	delayMillis(200);
-	setIntake(110, 90, -60, false);
+	//setIntake(110, 90, -60, false);
 	pidWait(WAIT);
 	delayMillis(1500);
 	// Grab blocks on other side of field and score
-	setIntake(127);
+	//setIntake(127);
 	driveSet(-12.75, DRIVE_SPEED, true);
 	pidWait(WAIT);
 	turnSet(90, TURN_SPEED);
@@ -335,15 +335,15 @@ void left_awp() {
 	pidWaitUntil(28_in);
 	chassis.pid_speed_max_set(60);
 	pidWait(WAIT);
-	setIntake(127, false);
+	//setIntake(127, false);
 	turnSet(-45, TURN_SPEED);
 	pidWait(WAIT);
 	driveSet(12.5, DRIVE_SPEED);
 	pidWait(WAIT);
-	setIntake(-100, -100, 100, false);
+	//setIntake(-100, -100, 100, false);
 	delayMillis(1000);
 	// Align to loader
-	setIntake(127);
+	//setIntake(127);
 	driveSet(-47, DRIVE_SPEED, true);
 	pidWait(WAIT);
 	turnSet(180, TURN_SPEED);
@@ -359,7 +359,7 @@ void left_awp() {
 	pidWait(WAIT);
 	driveSet(14, DRIVE_SPEED);
 	pidWait(WAIT);
-	setIntake(127, -127, 127, true);
+	//setIntake(127, -127, 127, true);
 }
 
 //
@@ -373,7 +373,7 @@ void skills() {
 	// Clear parking barrier
 	if(autonMode != BRAIN) {
 		driveSet(60, 80, true);
-		setIntake(127);
+		//setIntake(127);
 		pidWait(WAIT);
 		swingSet(LEFT_SWING, 90, SWING_SPEED, cw);
 		pidWait(WAIT);
@@ -387,9 +387,9 @@ void skills() {
 	pidWait(WAIT);
 	moveToPoint({24, 42}, fwd, DRIVE_SPEED);
 	pidWait(WAIT);
-	setIntake(127, -127, 127, true);
+	//setIntake(127, -127, 127, true);
 	delayMillis(1200);
-	setIntake(127);
+	//setIntake(127);
 	// Intake and score matchloader blocks
 	driveSet(-10, DRIVE_SPEED);
 	pidWait(WAIT);
@@ -406,9 +406,9 @@ void skills() {
 	pidWait(WAIT);
 	driveSet(18.5, 60);
 	pidWait(WAIT);
-	setIntake(127, -127, 127, true);
+	//setIntake(127, -127, 127, true);
 	delayMillis(1200);
-	setIntake(127);
+	//setIntake(127);
 	// Go to other side of field and repeat matchload scoring
 	swingSet(RIGHT_SWING, 90, SWING_SPEED, 35, cw);
 	pidWait(WAIT);
@@ -430,10 +430,10 @@ void skills() {
 	pidWait(WAIT);
 	driveSet(18.5, 60);
 	pidWait(WAIT);
-	setIntake(127, -127, 127, true);
+	//setIntake(127, -127, 127, true);
 	delayMillis(1200);
 	// Collect other parking barrier blocks
-	setIntake(127);
+	//setIntake(127);
 	driveSet(-12, DRIVE_SPEED);
 	pidWait(WAIT);
 	moveToPoint({40, 130}, fwd, DRIVE_SPEED);
@@ -444,7 +444,7 @@ void skills() {
 	swingSet(LEFT_SWING, 90, SWING_SPEED, 30, cw);
 	if(autonMode != BRAIN) {
 		driveSet(60, 80, true);
-		setIntake(127);
+		//setIntake(127);
 		pidWait(WAIT);
 		swingSet(LEFT_SWING, 90, SWING_SPEED, cw);
 		pidWait(WAIT);
@@ -458,9 +458,9 @@ void skills() {
 	pidWait(WAIT);
 	moveToPoint({120, 102}, fwd, DRIVE_SPEED);
 	pidWait(WAIT);
-	setIntake(127, -127, 127, true);
+	//setIntake(127, -127, 127, true);
 	delayMillis(1200);
-	setIntake(127);
+	//setIntake(127);
 	// Intake and score matchloader blocks
 	driveSet(-10, DRIVE_SPEED);
 	pidWait(WAIT);
@@ -477,9 +477,9 @@ void skills() {
 	pidWait(WAIT);
 	driveSet(18.5, 60);
 	pidWait(WAIT);
-	setIntake(127, -127, 127, true);
+	//setIntake(127, -127, 127, true);
 	delayMillis(1200);
-	setIntake(127);
+	//setIntake(127);
 	// Go to other side of field and repeat matchload scoring again, but only on low goals
 	swingSet(RIGHT_SWING, 270, SWING_SPEED, 35, cw);
 	pidWait(WAIT);
@@ -500,20 +500,20 @@ void skills() {
 	/*
 	pidWait(WAIT);
 	setAlliance(RED);
-	setIntake(127, -127, 127, false);
+	//setIntake(127, -127, 127, false);
 	delayMillis(2000);
 	// Score blue on mid goal
 	setAlliance(BLUE);
-	setIntake(127);
+	//setIntake(127);
 	moveToPoint({96, 48}, fwd, 70);
 	pidWait(WAIT);
 	moveToPoint({48, 48}, fwd, 70);
 	pidWait(WAIT);
 	moveToPoint({58, 58}, fwd, 70);
 	pidWait(WAIT);
-	setIntake(80, -90, -30, false);
+	//setIntake(80, -90, -30, false);
 	delayMillis(2500);
-	setIntake(127);
+	//setIntake(127);
 	// Score red on low goal
 	setAlliance(RED);
 	moveToPoint({48, 48}, rev, DRIVE_SPEED);
@@ -528,10 +528,10 @@ void skills() {
 	pidWait(WAIT);
 	moveToPoint({59, 85}, fwd, 70);
 	pidWait(WAIT);
-	setIntake(-70, -100, 127, false);
+	//setIntake(-70, -100, 127, false);
 	delayMillis(3000);
 	setAlliance(NEUTRAL);
-	setIntake(127);
+	//setIntake(127);
 	moveToPoint({48, 96}, rev, DRIVE_SPEED);
 	pidWait(WAIT);
 	moveToPoint({72, 112}, fwd, DRIVE_SPEED);
