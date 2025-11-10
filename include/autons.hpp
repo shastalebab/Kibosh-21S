@@ -39,3 +39,4 @@ void left_awp();
 //
 
 void skills();
+void skills_awp();

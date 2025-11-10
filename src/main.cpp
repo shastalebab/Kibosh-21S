@@ -3,10 +3,10 @@
 // Chassis constructor
 ez::Drive chassis(
 	// These are your drive motors, the first motor is used for sensing!
-	{-12, 17, -18},  // Left Chassis Ports (negative port will reverse it!)
-	{11, -20, 19},	  // Right Chassis Ports (negative port will reverse it!)
+	{-12, 16, -17},	 // Left Chassis Ports (negative port will reverse it!)
+	{11, -20, 19},	 // Right Chassis Ports (negative port will reverse it!)
 
-	17,				 // IMU Port
+	21,				 // IMU Port
 	WHEEL_DIAMETER,	 // Wheel Diameter
 	400);			 // Wheel RPM
 
@@ -24,20 +24,19 @@ void initialize() {
 
 	// Add autons to auton selector
 	auton_sel.selector_populate({{right_greed, "right_greed", "right side 9 in long goal", lv_color_darken(green, 60)},
-								 {right_split, "right_split", "right side 4 + 5", gray},
-								 {right_awp, "right_awp", "right side 4 + 3 + 3 solo AWP", violet},
 								 {left_greed, "left_greed", "left side 9 in long goal", green},
 								 {left_split, "left_split", "left side 4 + 5", lv_color_lighten(gray, 125)},
 								 {left_awp, "left_awp", "left side 4 + 3 + 3 solo AWP", pink},
 								 {constants_test, "constants_test", "drive and turn", blue},
-								{skills, "skills", "skills route", lv_color_darken(blue, 60)}});
+								 {skills, "skills", "skills route", lv_color_darken(blue, 60)},
+								 {skills_awp, "skills_awp", "awp route but for skills", lv_color_lighten(blue, 60)}});
 
 	// Initialize chassis, auton selector, and tasks
 	chassis.initialize();
 	uiInit();
 	pros::Task ColorTask(colorTask, "color sort");
 	pros::Task AntiJamTask(antiJamTask, "antijam");
-	pros::Task ControllerTask(controllerTask, "controller printing");
+	pros::Task ControllerTask(masterControllerTask, "master controller printing");
 	pros::Task PathViewerTask(pathViewerTask, "path viewer");
 	pros::Task AngleCheckTask(angleCheckTask, "angle checker");
 	pros::Task MotorUpdateTask(motorUpdateTask, "motor info updater");
@@ -71,10 +70,16 @@ void opcontrol() {
 	while(true) {
 		if(!probing) chassis.opcontrol_tank();	// Tank control
 
-		setParkOp(); // Double park macros
-		setIntakeOp();	 // Intake controls
-		setScraperOp();	 // Scraper controls
-		setDescoreOp();	 // Descore mech controls
+		setParkOp();	// Double park macros
+		setIntakeOp();	// Intake controls
+		setSorterOp();
+		setRedirectOp();  // Redirect controls
+		setScraperOp();	  // Scraper controls
+		setDescoreOp();	  // Descore mech controls
+
+		setIntakeTeam();
+		// setSorterTeam();
+		setBrakesTeam();
 
 		pros::delay(ez::util::DELAY_TIME);
 	}

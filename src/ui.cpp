@@ -131,8 +131,8 @@ vector<MotorDisp> chassisMotors = {MotorDisp(&chassis.left_motors[0], "front lef
 								   MotorDisp(&chassis.left_motors[2], "back left", lv_color_lighten(pink, 120), 50),
 								   MotorDisp(&chassis.right_motors[2], "back right", lv_color_lighten(violet, 120), 50)};
 
-vector<MotorDisp> intakeMotors = {MotorDisp(&intakeFront, "front stage", lv_color_lighten(blue, 80), 50),
-								  MotorDisp(&intakeBack, "back stage", lv_color_lighten(green, 80), 50)};
+vector<MotorDisp> intakeMotors = {MotorDisp(&intakeFirst, "front stage", lv_color_lighten(blue, 80), 50),
+								  MotorDisp(&intakeSecond, "back stage", lv_color_lighten(green, 80), 50)};
 
 MotorTab chassisTabObj = 
 	MotorTab("chassis", theme_color, &chassis.leftPID.error, 24, chassisMotors, drive_test, false,
@@ -144,7 +144,7 @@ MotorTab driveTabObj =
 	MotorTab("drive PID", theme_color, &chassis.leftPID.error, 24, chassisMotors, drive_test, true,
 								PidTunerValues(0.25, 0.05, 0.25, &chassis.fwd_rev_drivePID), driveTab);
 MotorTab turnTabObj =
-	MotorTab("turn PID", theme_color, &chassis.turnPID.error, 360, chassisMotors, turn_test, true, PidTunerValues(0.25, 0.05, 0.25, &chassis.turnPID), turnTab);
+	MotorTab("turn PID", theme_color, &chassis.turnPID.error, 90, chassisMotors, turn_test, true, PidTunerValues(0.25, 0.05, 0.25, &chassis.turnPID), turnTab);
 MotorTab swingTabObj = 
 	MotorTab("swing PID", theme_color, &chassis.swingPID.error, 90, chassisMotors, swing_test, true,
 								PidTunerValues(0.25, 0.05, 0.25, &chassis.fwd_rev_swingPID), swingTab);

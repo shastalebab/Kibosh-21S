@@ -6,22 +6,23 @@
 #include "pros/motors.hpp"
 
 extern Drive chassis;
+extern pros::Controller team;
 
 // Your motors, sensors, etc. should go here.  Below are examples
 
-inline pros::Optical colorSens(19);
-inline pros::Optical proximitySens(20);
-inline pros::Distance distanceSens(2);
+inline pros::Optical colorSens(21);
+inline pros::Optical proximitySens(2);
+inline pros::Distance distanceSens(3);
 
-inline pros::Motor intakeNone(21);
-inline pros::Motor intakeFront(1);
+inline pros::Motor intakeFirst(-1);
 inline pros::Motor intakeSecond(10);
-inline pros::Motor intakeBack(-8);
-inline ez::Piston scraper('A');
+inline ez::Piston scraper('D');
 inline ez::Piston descore('B');
-inline ez::Piston indexer('C');
-inline ez::Piston redirect('D');
-inline ez::Piston park('E');
+inline ez::Piston indexer('H');
+inline ez::Piston sorter('G');
+inline ez::Piston redirect('E');
+inline ez::Piston park('F');
+inline ez::Piston brakes('G');
 
 class Jammable {
    private:
@@ -29,33 +30,32 @@ class Jammable {
 
    public:
 	vector<pros::Motor*> motors;
-	int* target;
+	int target;
 	int limit;
 	int attempts;
+	int delayTime;
 	float maxTemp;
-	bool ignoreSort;
 	bool pause;
 
 	bool lock;
 	void checkJam();
 
 	Jammable() {
-		motors = {&intakeNone};
-		target = nullptr;
+		motors = {};
+		target = 0;
 		attempts = 20;
 		limit = 4;
+		delayTime = 100;
 		maxTemp = 55;
-		ignoreSort = true;
 		pause = false;
 		lock = false;
 	}
-	Jammable(vector <pros::Motor*> Motors, int* Target, int Limit, int Attempts, float MaxTemp, bool IgnoreSort, bool Pause) {
+	Jammable(vector <pros::Motor*> Motors, int Limit, int Attempts, int DelayTime, float MaxTemp, bool Pause) {
 		motors = Motors;
-		target = Target;
 		attempts = Attempts;
 		limit = Limit;
+		delayTime = DelayTime;
 		maxTemp = MaxTemp;
-		ignoreSort = IgnoreSort;
 		pause = Pause;
 		lock = false;
 	}
@@ -64,20 +64,20 @@ class Jammable {
 enum Colors { BLUE = 0, NEUTRAL = 1, RED = 2 };
 
 extern Colors allianceColor;
-extern Jammable none;
-extern Jammable front;
-extern Jammable back;
-
-extern Jammable* targetMotor;
+extern Jammable intakeFront;
+extern Jammable intakeBack;
 
 bool shift();
 
-void setIntake(int first_speed, int second_speed, bool indexer_up, bool redirect_up);
-void setIntake(int first_speed, int second_speed, bool redirect_up);
-void setIntake(int first_speed, int second_speed);
+void setIntake(int speed, bool indexer_on);
+void setIntake(int speed);
+
+void setRedirect(bool state);
 void setScraper(bool state);
 void setDescore(bool state);
+void setSorter(bool state);
 void setPark(bool state);
+void setBrakes(bool state);
 
 void setAlliance(Colors alliance);
 void colorToggle();
@@ -86,10 +86,17 @@ void colorSet(Colors color, lv_obj_t* object);
 void sendHaptic(string input);
 
 void setIntakeOp();
+void setSorterOp();
+void setRedirectOp();
 void setScraperOp();
 void setDescoreOp();
 void setParkOp();
 
+void setIntakeTeam();
+void setSorterTeam();
+void setBrakesTeam();
+
 void colorTask();
 void antiJamTask();
-void controllerTask();
+void masterControllerTask();
+void teamControllerTask();
