@@ -10,16 +10,16 @@ extern pros::Controller team;
 
 // Your motors, sensors, etc. should go here.  Below are examples
 
-inline pros::Optical colorSens(21);
-inline pros::Optical proximitySens(2);
-inline pros::Distance distanceSens(3);
+inline pros::Optical colorSens(2);
+inline pros::Optical proximitySens(3);
+inline pros::Distance distanceSens(4);
 
 inline pros::Motor intakeFirst(-1);
 inline pros::Motor intakeSecond(10);
 inline ez::Piston scraper('D');
-inline ez::Piston descore('B');
+inline ez::Piston wing('B');
 inline ez::Piston indexer('H');
-inline ez::Piston sorter('G');
+inline ez::Piston descore('G');
 inline ez::Piston redirect('E');
 inline ez::Piston park('F');
 inline ez::Piston brakes('G');
@@ -74,8 +74,8 @@ void setIntake(int speed);
 
 void setRedirect(bool state);
 void setScraper(bool state);
+void setWing(bool state);
 void setDescore(bool state);
-void setSorter(bool state);
 void setPark(bool state);
 void setBrakes(bool state);
 
@@ -86,14 +86,14 @@ void colorSet(Colors color, lv_obj_t* object);
 void sendHaptic(string input);
 
 void setIntakeOp();
-void setSorterOp();
 void setRedirectOp();
 void setScraperOp();
+void setWingOp();
 void setDescoreOp();
 void setParkOp();
 
 void setIntakeTeam();
-void setSorterTeam();
+void setDescoreTeam();
 void setBrakesTeam();
 
 void colorTask();

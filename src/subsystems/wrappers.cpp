@@ -6,7 +6,11 @@
 
 void setIntake(int speed, bool indexer_on) {
 	if(autonMode != BRAIN) {
+		bool use_delay = false;
+		if(!indexer_on && indexer.get()) use_delay = true;
+
 		indexer.set(indexer_on);
+		if(use_delay) pros::delay(250);
 		setIntake(speed);
 	}
 }
@@ -32,15 +36,15 @@ void setScraper(bool state) {
 	}
 }
 
-void setDescore(bool state) {
+void setWing(bool state) {
 	if(autonMode != BRAIN) {
-		descore.set(state);
+		wing.set(state);
 	}
 }
 
-void setSorter(bool state) {
+void setDescore(bool state) {
 	if(autonMode != BRAIN) {
-		sorter.set(state);
+		descore.set(state);
 	}
 }
 

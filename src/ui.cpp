@@ -67,7 +67,9 @@ void angleCheckTask() {
 			auto current = fmod(chassis.odom_theta_get(), 360);
 			lv_label_set_text(angleText,
 							  (util::to_string_with_precision(current, 2) + " °" + "\ntarget: " + util::to_string_with_precision(target, 2)).c_str());
-			if(target + 0.15 >= current && target - 0.15 <= current)
+			if(drifting)
+				lv_obj_set_style_bg_color(angleViewer, blue, LV_PART_MAIN);
+			else if(target + 0.15 >= current && target - 0.15 <= current)
 				lv_obj_set_style_bg_color(angleViewer, green, LV_PART_MAIN);
 			else
 				lv_obj_set_style_bg_color(angleViewer, red, LV_PART_MAIN);
@@ -134,22 +136,17 @@ vector<MotorDisp> chassisMotors = {MotorDisp(&chassis.left_motors[0], "front lef
 vector<MotorDisp> intakeMotors = {MotorDisp(&intakeFirst, "front stage", lv_color_lighten(blue, 80), 50),
 								  MotorDisp(&intakeSecond, "back stage", lv_color_lighten(green, 80), 50)};
 
-MotorTab chassisTabObj = 
-	MotorTab("chassis", theme_color, &chassis.leftPID.error, 24, chassisMotors, drive_test, false,
+MotorTab chassisTabObj = MotorTab("chassis", theme_color, &chassis.leftPID.error, 24, chassisMotors, drive_test, false,
 								  PidTunerValues(0.25, 0.05, 0.25, &chassis.fwd_rev_drivePID), chassisTab);
-MotorTab intakeTabObj = 
-	MotorTab("intake", theme_color, &chassis.leftPID.error, 24, intakeMotors, drive_test, false,
+MotorTab intakeTabObj = MotorTab("intake", theme_color, &chassis.leftPID.error, 24, intakeMotors, drive_test, false,
 								 PidTunerValues(0.25, 0.05, 0.25, &chassis.fwd_rev_drivePID), intakeTab);
-MotorTab driveTabObj = 
-	MotorTab("drive PID", theme_color, &chassis.leftPID.error, 24, chassisMotors, drive_test, true,
+MotorTab driveTabObj = MotorTab("drive PID", theme_color, &chassis.leftPID.error, 24, chassisMotors, drive_test, true,
 								PidTunerValues(0.25, 0.05, 0.25, &chassis.fwd_rev_drivePID), driveTab);
 MotorTab turnTabObj =
 	MotorTab("turn PID", theme_color, &chassis.turnPID.error, 90, chassisMotors, turn_test, true, PidTunerValues(0.25, 0.05, 0.25, &chassis.turnPID), turnTab);
-MotorTab swingTabObj = 
-	MotorTab("swing PID", theme_color, &chassis.swingPID.error, 90, chassisMotors, swing_test, true,
+MotorTab swingTabObj = MotorTab("swing PID", theme_color, &chassis.swingPID.error, 90, chassisMotors, swing_test, true,
 								PidTunerValues(0.25, 0.05, 0.25, &chassis.fwd_rev_swingPID), swingTab);
-MotorTab headingTabObj = 
-	MotorTab("heading PID", theme_color, &chassis.turnPID.error, 180, chassisMotors, heading_test, true,
+MotorTab headingTabObj = MotorTab("heading PID", theme_color, &chassis.turnPID.error, 180, chassisMotors, heading_test, true,
 								  PidTunerValues(0.25, 0.05, 0.25, &chassis.headingPID), headingTab);
 
 MotorTab* selectedTabObj = &driveTabObj;

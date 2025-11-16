@@ -58,7 +58,7 @@ void colorTask() {
 		if(!pros::competition::is_disabled()) {
 			if(colorCompare(color) && !sleep) {
 				if(sortTime < 10) {
-					//setSorter(false);
+					//setDescore(false);
                     pros::delay(250);
 					sortTime++;
 				} else {
@@ -67,7 +67,7 @@ void colorTask() {
 			} else {
 				sortTime = 0;
 				sleep = false;
-                //setSorter(true);
+                //setDescore(true);
 			}
 		}
 		pros::delay(10);

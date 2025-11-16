@@ -4,8 +4,8 @@
 // Anti-jam
 //
 
-Jammable intakeFront = Jammable({&intakeFirst}, 30, 10, 200, 60, false);
-Jammable intakeBack = Jammable({&intakeSecond}, 20, 5, 80, 60, false);
+Jammable intakeFront = Jammable({&intakeFirst}, 30, 10, 200, 55, false);
+Jammable intakeBack = Jammable({&intakeSecond}, 20, 5, 80, 55, false);
 
 void Jammable::checkJam() {
 	double currentTemp = 0.0;

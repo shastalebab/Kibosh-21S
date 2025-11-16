@@ -143,6 +143,7 @@ class MotorTab {
 
 extern string controllerInput;
 extern AutonSel auton_sel;
+extern bool drifting;
 
 // Main UI
 extern lv_obj_t* main_tv;

@@ -1,5 +1,7 @@
 #include "main.h"
 
+bool drifting = false;
+
 // Chassis constructor
 ez::Drive chassis(
 	// These are your drive motors, the first motor is used for sensing!
@@ -31,8 +33,13 @@ void initialize() {
 								 {skills, "skills", "skills route", lv_color_darken(blue, 60)},
 								 {skills_awp, "skills_awp", "awp route but for skills", lv_color_lighten(blue, 60)}});
 
-	// Initialize chassis, auton selector, and tasks
+	// Initialize chassis
 	chassis.initialize();
+	double initial = chassis.drive_imu_get();
+	pros::delay(1000);
+	if(abs(chassis.drive_imu_get() - initial) > 1) drifting = true;
+
+	// Initialize auton selector, and tasks
 	uiInit();
 	pros::Task ColorTask(colorTask, "color sort");
 	pros::Task AntiJamTask(antiJamTask, "antijam");
@@ -40,7 +47,7 @@ void initialize() {
 	pros::Task PathViewerTask(pathViewerTask, "path viewer");
 	pros::Task AngleCheckTask(angleCheckTask, "angle checker");
 	pros::Task MotorUpdateTask(motorUpdateTask, "motor info updater");
-	master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
+	master.rumble(chassis.drive_imu_calibrated() && !drifting ? "." : "---");
 }
 
 void disabled() {}
@@ -70,16 +77,14 @@ void opcontrol() {
 	while(true) {
 		if(!probing) chassis.opcontrol_tank();	// Tank control
 
-		setParkOp();	// Double park macros
-		setIntakeOp();	// Intake controls
-		setSorterOp();
+		setIntakeOp();	  // Intake controls
 		setRedirectOp();  // Redirect controls
 		setScraperOp();	  // Scraper controls
-		setDescoreOp();	  // Descore mech controls
+		setWingOp();	  // Wing mech controls
+		setDescoreOp();	  // Wing hook controls
 
-		setIntakeTeam();
-		// setSorterTeam();
-		setBrakesTeam();
+		setIntakeTeam();   // Team intake overrides
+		setDescoreTeam();  // Team descore overrides
 
 		pros::delay(ez::util::DELAY_TIME);
 	}

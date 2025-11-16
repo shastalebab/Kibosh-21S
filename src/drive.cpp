@@ -136,6 +136,8 @@ std::vector<Coordinate> injectPath(std::vector<Coordinate> coordList, double loo
 // Set position wrappers
 //
 
+void setPosition(double x, double y) { setPosition(x, y, currentPoint.t); }
+
 void setPosition(double x, double y, double t) {
 	currentPoint.x = x;
 	currentPoint.y = y;
@@ -144,9 +146,7 @@ void setPosition(double x, double y, double t) {
 	autonPath.push_back(currentPoint);
 }
 
-double getDistanceActual() { 
-	return (distanceSens.get() / 25.4) + 7.875; 
-}
+double getDistanceActual() { return (distanceSens.get() / 25.4) + 6.625; }
 
 //
 // Wait wrappers
