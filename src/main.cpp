@@ -75,16 +75,19 @@ void opcontrol() {
 						// in opcontrol only use PID
 
 	while(true) {
-		if(!probing) chassis.opcontrol_tank();	// Tank control
+		if(!probing && !overrideDrive) chassis.opcontrol_tank();  // Tank control
 
 		setIntakeOp();	  // Intake controls
 		setRedirectOp();  // Redirect controls
 		setScraperOp();	  // Scraper controls
+		setAlignerOp();	  // Aligner controls
 		setWingOp();	  // Wing mech controls
 		setDescoreOp();	  // Wing hook controls
+		setStraightOp();
 
-		setIntakeTeam();   // Team intake overrides
-		setDescoreTeam();  // Team descore overrides
+		setIntakeTeam();	// Team intake overrides
+		setDescoreTeam();	// Team descore overrides
+		setStraightTeam();	// Team driving overrides
 
 		pros::delay(ez::util::DELAY_TIME);
 	}

@@ -7,12 +7,13 @@
 
 extern Drive chassis;
 extern pros::Controller team;
+extern bool overrideDrive;
 
 // Your motors, sensors, etc. should go here.  Below are examples
 
 inline pros::Optical colorSens(2);
 inline pros::Optical proximitySens(3);
-inline pros::Distance distanceSens(4);
+inline pros::Distance distanceSens(8);
 
 inline pros::Motor intakeFirst(-1);
 inline pros::Motor intakeSecond(10);
@@ -21,8 +22,10 @@ inline ez::Piston wing('B');
 inline ez::Piston indexer('H');
 inline ez::Piston descore('G');
 inline ez::Piston redirect('E');
-inline ez::Piston park('F');
+inline ez::Piston aligner('F');
 inline ez::Piston brakes('G');
+
+inline ez::PID driveHeading(6.25, 0.1, 39.25);
 
 class Jammable {
    private:
@@ -76,7 +79,7 @@ void setRedirect(bool state);
 void setScraper(bool state);
 void setWing(bool state);
 void setDescore(bool state);
-void setPark(bool state);
+void setAligner(bool state);
 void setBrakes(bool state);
 
 void setAlliance(Colors alliance);
@@ -85,16 +88,20 @@ void colorSet(Colors color, lv_obj_t* object);
 
 void sendHaptic(string input);
 
+void setStraight(int init_heading);
+
 void setIntakeOp();
 void setRedirectOp();
 void setScraperOp();
 void setWingOp();
 void setDescoreOp();
-void setParkOp();
+void setAlignerOp();
+void setStraightOp();
 
 void setIntakeTeam();
 void setDescoreTeam();
 void setBrakesTeam();
+void setStraightTeam();
 
 void colorTask();
 void antiJamTask();

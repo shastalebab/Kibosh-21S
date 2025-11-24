@@ -10,7 +10,10 @@ void setIntake(int speed, bool indexer_on) {
 		if(!indexer_on && indexer.get()) use_delay = true;
 
 		indexer.set(indexer_on);
-		if(use_delay) pros::delay(250);
+		if(use_delay) {
+			setIntake(0);
+			pros::delay(250);
+		}
 		setIntake(speed);
 	}
 }
@@ -18,9 +21,9 @@ void setIntake(int speed, bool indexer_on) {
 void setIntake(int speed) {
 	if(autonMode != BRAIN) {
 		if(intakeFront.lock != true) intakeFront.motors[0]->move(speed);
-        if(intakeBack.lock != true) intakeBack.motors[0]->move(speed);
+		if(intakeBack.lock != true) intakeBack.motors[0]->move(speed);
 		intakeFront.target = speed;
-        intakeBack.target = speed;
+		intakeBack.target = speed;
 	}
 }
 
@@ -48,14 +51,44 @@ void setDescore(bool state) {
 	}
 }
 
-void setPark(bool state) {
+void setAligner(bool state) {
 	if(autonMode != BRAIN) {
-		park.set(state);
+		aligner.set(state);
 	}
 }
 
 void setBrakes(bool state) {
-    if(autonMode != BRAIN) {
+	if(autonMode != BRAIN) {
 		brakes.set(state);
 	}
+}
+
+int cooldown = 0;
+int headingMod = 0;
+int iter = 0;
+
+void setStraight(int init_heading) {
+	if(overrideDrive) {
+		double stick_left = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+		double stick_right = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
+		double input = (stick_left + stick_right) / 2;
+
+		if(cooldown == 0 && stick_left != 0 && input == 0) iter++;
+		if(cooldown > 0) cooldown--;
+
+		if(iter > 10) {
+			headingMod += (45 * util::sgn(stick_left));
+			cooldown = 10;
+			iter = 0;
+		}
+
+		driveHeading.target_set(util::turn_shortest(init_heading + headingMod, chassis.drive_imu_get()));
+		double correction = driveHeading.compute(chassis.drive_imu_get());
+
+		double l_out = input + correction;
+		double r_out = input - correction;
+
+		chassis.drive_set(l_out, r_out);
+	} else
+		headingMod = 0;
 }

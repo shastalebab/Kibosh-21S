@@ -1,11 +1,15 @@
 #include "main.h"  // IWYU pragma: keep
 
+
 //
 // Operator control
 //
 
 bool interruptintake = false;
 bool interruptDescore = false;
+bool interruptDrive = false;
+bool overrideDrive = false;
+double imu_cur = 0;
 int masterTarget = 0;
 
 bool shift() { return master.get_digital(pros::E_CONTROLLER_DIGITAL_R2); }
@@ -33,15 +37,24 @@ void setRedirectOp() {
 			sendHaptic("--");
 			return;
 		}
+		if(aligner.get()) aligner.set(false);
 		redirect.set(!redirect.get());
 	}
 }
 
 void setScraperOp() {
+	int delayTime = 0;
 	if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
-		if(!scraper.get() && redirect.get()) {
-			redirect.set(false);
-			pros::delay(200);
+		if(!scraper.get()) {
+			if(redirect.get()) {
+				redirect.set(false);
+				delayTime = 200;
+			}
+			if(aligner.get()) {
+				aligner.set(false);
+				delayTime = 200;
+			}
+			pros::delay(delayTime);
 		}
 		scraper.set(!scraper.get());
 	}
@@ -58,7 +71,31 @@ void setDescoreOp() {
 		descore.set(false);
 }
 
-void setParkOp() { park.button_toggle(master.get_digital(pros::E_CONTROLLER_DIGITAL_A)); }
+void setAlignerOp() {
+	if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
+		if(!redirect.get()) {
+			if(scraper.get()) {
+				scraper.set(false);
+				pros::delay(200);
+			}
+			aligner.set(!aligner.get());
+		}
+	}
+}
+
+void setStraightOp() {
+	if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
+		if(util::turn_shortest(imu_cur - 90, chassis.drive_imu_get()) > util::turn_shortest(imu_cur + 90, chassis.drive_imu_get())) imu_cur += 180;
+		overrideDrive = !overrideDrive;
+		interruptDrive = false;
+		sendHaptic("-");
+	}
+	if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
+		imu_cur = chassis.drive_imu_get();
+		sendHaptic(". .");
+	}
+	setStraight(imu_cur);
+}
 
 //
 // Team control
@@ -94,4 +131,14 @@ void setBrakesTeam() {
 		setBrakes(true);
 	else if(!master.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))
 		setBrakes(false);
+}
+
+void setStraightTeam() {
+	if(team.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1) && !interruptDrive) {
+		interruptDrive = true;
+		sendHaptic("---");
+	}
+	if(interruptDrive) {
+		overrideDrive = team.get_digital(pros::E_CONTROLLER_DIGITAL_R1);
+	}
 }

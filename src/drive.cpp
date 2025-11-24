@@ -146,7 +146,7 @@ void setPosition(double x, double y, double t) {
 	autonPath.push_back(currentPoint);
 }
 
-double getDistanceActual() { return (distanceSens.get() / 25.4) + 6.625; }
+double getDistanceActual() { return (distanceSens.get() / 25.4) + 7.5; }
 
 //
 // Wait wrappers
