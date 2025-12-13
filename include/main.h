@@ -47,6 +47,7 @@
 #include "autons.hpp"
 #include "subsystems.hpp"
 #include "drive.hpp"
+#include "stanley.hpp"
 #include "ui.hpp"
 
 

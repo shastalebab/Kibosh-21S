@@ -3,30 +3,27 @@
 #include "EZ-Template/api.hpp"
 #include "EZ-Template/util.hpp"
 
-const double WHEEL_DIAMETER = 3.3 ;
+const double WHEEL_DIAMETER = 3.2175;
 const double ROBOT_WIDTH = 11.4375;
 const int KEY = 267267;
 
 enum AutonMode {
-    ODOM = 0,
-    PLAIN = 1,
-    BRAIN = 2,
+    STANLEY = 0,
+	ODOM = 1,
+	PLAIN = 2,
+	BRAIN = 3,
 };
 
-enum Wait {
-    WAIT = 0,
-    QUICK = 1,
-    CHAIN = 2
-};
+enum Wait { WAIT = 0, QUICK = 1, CHAIN = 2 };
 
 class Coordinate {
-    public: 
-        double x = 0;
-        double y = 0;
-        double t = 0;
-        double right = 127;
-        double left = 0;
-        ez::e_angle_behavior behavior = ez::cw;
+   public:
+	double x = 0;
+	double y = 0;
+	double t = 0;
+	double right = 127;
+	double left = 0;
+	ez::e_angle_behavior behavior = ez::cw;
 };
 
 extern AutonMode autonMode;
@@ -39,7 +36,8 @@ double getVelocity(double voltage);
 double getTimeToPoint(double distance, double velocity);
 Coordinate getPoint(Coordinate startPoint, double distance);
 Coordinate getPoint(Coordinate startPoint, double v_left, double v_right, double time);
-std::vector<Coordinate> injectPoint(Coordinate startPoint, Coordinate endPoint, e_angle_behavior behavior, double left, double right, double theta, double lookAhead);
+std::vector<Coordinate> injectPoint(Coordinate startPoint, Coordinate endPoint, e_angle_behavior behavior, double left, double right, double theta,
+									double lookAhead);
 std::vector<Coordinate> injectPath(std::vector<Coordinate> coordList, double lookAhead);
 
 // Set position wrappers
@@ -61,6 +59,7 @@ void moveToPoint(Coordinate newpoint, ez::drive_directions direction, int speed)
 // Drive set wrappers
 void driveSet(double distance, int speed, bool slew);
 void driveSet(double distance, int speed);
+void driveSmartSet(double distance, int speed);
 
 // Turn set wrappers
 void turnSet(double theta, int speed, e_angle_behavior behavior);

@@ -16,6 +16,7 @@ void drive_test(int inches);
 void turn_test(int degrees);
 void swing_test(int degrees);
 void heading_test(int degrees);
+void odom_test(int degrees);
 void constants_test();
 
 //

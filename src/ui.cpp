@@ -1,4 +1,6 @@
+#include "EZ-Template/util.hpp"
 #include "main.h"  // IWYU pragma: keep
+#include "subsystems.hpp"
 
 // // // // // // Tasks & Non-UI // // // // // //
 
@@ -35,6 +37,7 @@ lv_obj_t* driveTab = lv_tabview_add_tab(pidTabview, "drive");
 lv_obj_t* turnTab = lv_tabview_add_tab(pidTabview, "turn");
 lv_obj_t* swingTab = lv_tabview_add_tab(pidTabview, "swing");
 lv_obj_t* headingTab = lv_tabview_add_tab(pidTabview, "heading");
+lv_obj_t* odomTab = lv_tabview_add_tab(pidTabview, "odom");
 
 lv_obj_t* motorPopup;
 
@@ -63,10 +66,17 @@ void AutonSel::selector_populate(vector<AutonObj> auton_list) { autons.insert(au
 void angleCheckTask() {
 	while(true) {
 		if(aligning) {
-			auto target = autonPath.size() > 0 ? autonPath[0].t : 0;
-			auto current = fmod(chassis.odom_theta_get(), 360);
+			double target = autonPath.size() > 0 ? autonPath[0].t : 0;
+			double current = fmod(chassis.odom_theta_get(), 360);
+			pair<double, double> travel = {chassis.drive_sensor_left(), chassis.drive_sensor_right()};
+			pair<double, double> coordinate = {chassis.odom_x_get(), chassis.odom_y_get()};
+			target = util::wrap_angle(target);
+			current = util::wrap_angle(current);
 			lv_label_set_text(angleText,
-							  (util::to_string_with_precision(current, 2) + " °" + "\ntarget: " + util::to_string_with_precision(target, 2)).c_str());
+							  (util::to_string_with_precision(current, 2) + " °" + ", target: " + util::to_string_with_precision(target, 2) +
+							   "\nleft: " + util::to_string_with_precision(travel.first, 2) + ", right: " + util::to_string_with_precision(travel.second, 2) +
+							   "\nx: " + util::to_string_with_precision(coordinate.first, 2) + ", y: " + util::to_string_with_precision(coordinate.second, 2))
+								  .c_str());
 			if(drifting)
 				lv_obj_set_style_bg_color(angleViewer, blue, LV_PART_MAIN);
 			else if(target + 0.15 >= current && target - 0.15 <= current)
@@ -144,10 +154,12 @@ MotorTab driveTabObj = MotorTab("drive PID", theme_color, &chassis.leftPID.error
 								PidTunerValues(0.25, 0.05, 0.25, &chassis.fwd_rev_drivePID), driveTab);
 MotorTab turnTabObj =
 	MotorTab("turn PID", theme_color, &chassis.turnPID.error, 90, chassisMotors, turn_test, true, PidTunerValues(0.25, 0.05, 0.25, &chassis.turnPID), turnTab);
-MotorTab swingTabObj = MotorTab("swing PID", theme_color, &chassis.swingPID.error, 90, chassisMotors, swing_test, true,
+MotorTab swingTabObj = MotorTab("swing PID", theme_color, &chassis.swingPID.error, 45, chassisMotors, swing_test, true,
 								PidTunerValues(0.25, 0.05, 0.25, &chassis.fwd_rev_swingPID), swingTab);
 MotorTab headingTabObj = MotorTab("heading PID", theme_color, &chassis.turnPID.error, 180, chassisMotors, heading_test, true,
 								  PidTunerValues(0.25, 0.05, 0.25, &chassis.headingPID), headingTab);
+MotorTab odomTabObj = MotorTab("odom PID", theme_color, &chassis.odom_angularPID.error, 45, chassisMotors, odom_test, true,
+							   PidTunerValues(6.25, 0.1, 39.25, &chassis.odom_angularPID), odomTab);
 
 MotorTab* selectedTabObj = &driveTabObj;
 
@@ -330,7 +342,7 @@ static void angleCheckEvent(lv_event_t* e) {
 	lv_obj_add_event_cb(lv_msgbox_get_close_btn(angleViewer), AngleCheckCloseEvent, LV_EVENT_PRESSED, NULL);
 	lv_obj_add_style(lv_msgbox_get_close_btn(angleViewer), &pushback, LV_PART_MAIN);
 	lv_obj_add_style(angleViewer, &pushback, LV_PART_MAIN);
-	lv_obj_set_style_text_font(angleViewer, &lv_font_montserrat_30, LV_PART_MAIN);
+	lv_obj_set_style_text_font(angleViewer, &lv_font_montserrat_18, LV_PART_MAIN);
 	lv_obj_set_style_text_font(lv_msgbox_get_title(angleViewer), &lv_font_montserrat_14, LV_PART_MAIN);
 	lv_obj_set_style_text_font(lv_msgbox_get_close_btn(angleViewer), &lv_font_montserrat_24, LV_PART_MAIN);
 	lv_obj_set_width(angleViewer, 300);

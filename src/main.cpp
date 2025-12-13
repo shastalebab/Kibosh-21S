@@ -17,7 +17,7 @@ void initialize() {
 
 	// Configure chassis controls
 	chassis.opcontrol_curve_buttons_toggle(false);	// Enables modifying the controller curve with controller buttons
-	chassis.opcontrol_drive_activebrake_set(0.0);	// Sets the active brake kP
+	chassis.opcontrol_drive_activebrake_set(2.0);	// Sets the active brake kP
 	chassis.opcontrol_curve_default_set(0.0,
 										0.0);  // Set defaults for controller curve
 
@@ -28,7 +28,8 @@ void initialize() {
 	auton_sel.selector_populate({{right_greed, "right_greed", "right side 9 in long goal", lv_color_darken(green, 60)},
 								 {left_greed, "left_greed", "left side 9 in long goal", green},
 								 {left_split, "left_split", "left side 4 + 5", lv_color_lighten(gray, 125)},
-								 {left_awp, "left_awp", "left side 4 + 3 + 3 solo AWP", pink},
+								 {right_awp, "right_awp", "right side 4 + 6 + 3 solo AWP", violet},
+								 {left_awp, "left_awp", "left side 4 + 3 + 6 solo AWP", pink},
 								 {constants_test, "constants_test", "drive and turn", blue},
 								 {skills, "skills", "skills route", lv_color_darken(blue, 60)},
 								 {skills_awp, "skills_awp", "awp route but for skills", lv_color_lighten(blue, 60)}});
@@ -41,6 +42,7 @@ void initialize() {
 
 	// Initialize auton selector, and tasks
 	uiInit();
+	pros::Task StanleyTask(stanleyTask, "stanley controller");
 	pros::Task ColorTask(colorTask, "color sort");
 	pros::Task AntiJamTask(antiJamTask, "antijam");
 	pros::Task ControllerTask(masterControllerTask, "master controller printing");
@@ -63,7 +65,7 @@ void autonomous() {
 	chassis.drive_brake_set(MOTOR_BRAKE_HOLD);	// Set motors to hold.  This helps
 												// autonomous consistency
 
-	autonMode = PLAIN;				// Sets which "mode" the auton is run in (between "PLAIN"
+	autonMode = ODOM;				// Sets which "mode" the auton is run in (between "PLAIN"
 									// and "ODOM")
 	autonPath = {};					// Clears saved auton path
 	auton_sel.selector_callback();	// Calls selected auton from autonomous selector
@@ -81,8 +83,8 @@ void opcontrol() {
 		setRedirectOp();  // Redirect controls
 		setScraperOp();	  // Scraper controls
 		setAlignerOp();	  // Aligner controls
-		setWingOp();	  // Wing mech controls
-		setDescoreOp();	  // Wing hook controls
+		setWingOp();	  // Wing controls
+		setDescoreOp();	  // Hook controls
 		setStraightOp();
 
 		setIntakeTeam();	// Team intake overrides

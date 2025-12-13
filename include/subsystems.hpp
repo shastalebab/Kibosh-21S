@@ -17,6 +17,7 @@ inline pros::Distance distanceSens(8);
 
 inline pros::Motor intakeFirst(-1);
 inline pros::Motor intakeSecond(10);
+inline pros::MotorGroup intakelalala({1, 2, 3});
 inline ez::Piston scraper('D');
 inline ez::Piston wing('B');
 inline ez::Piston indexer('H');
