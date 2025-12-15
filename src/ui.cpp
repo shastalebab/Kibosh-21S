@@ -1,6 +1,4 @@
-#include "EZ-Template/util.hpp"
 #include "main.h"  // IWYU pragma: keep
-#include "subsystems.hpp"
 
 // // // // // // Tasks & Non-UI // // // // // //
 
@@ -158,12 +156,12 @@ MotorTab swingTabObj = MotorTab("swing PID", theme_color, &chassis.swingPID.erro
 								PidTunerValues(0.25, 0.05, 0.25, &chassis.fwd_rev_swingPID), swingTab);
 MotorTab headingTabObj = MotorTab("heading PID", theme_color, &chassis.turnPID.error, 180, chassisMotors, heading_test, true,
 								  PidTunerValues(0.25, 0.05, 0.25, &chassis.headingPID), headingTab);
-MotorTab odomTabObj = MotorTab("odom PID", theme_color, &chassis.odom_angularPID.error, 45, chassisMotors, odom_test, true,
-							   PidTunerValues(6.25, 0.1, 39.25, &chassis.odom_angularPID), odomTab);
+MotorTab odomTabObj = MotorTab("odom PID", theme_color, &chassis.odom_angularPID.error, 135, chassisMotors, odom_test, true,
+							   PidTunerValues(0.25, 0.05, 0.25, &chassis.odom_angularPID), odomTab);
 
 MotorTab* selectedTabObj = &driveTabObj;
 
-vector<MotorTab> tabList{chassisTabObj, intakeTabObj, driveTabObj, turnTabObj, swingTabObj, headingTabObj};
+vector<MotorTab> tabList{chassisTabObj, intakeTabObj, driveTabObj, turnTabObj, swingTabObj, headingTabObj, odomTabObj};
 
 bool reading = false;
 bool probing = false;
@@ -688,7 +686,8 @@ void pidTunerInit() {
 	driveTabObj.addTab();
 	turnTabObj.addTab();
 	swingTabObj.addTab();
-	headingTabObj.addTab();
+	//headingTabObj.addTab();
+	odomTabObj.addTab();
 
 	// Modify styles
 	lv_obj_set_style_text_font(tabs, &pros_font_dejavu_mono_18, LV_PART_ITEMS);
@@ -715,6 +714,7 @@ void pidTunerInit() {
 	lv_obj_set_user_data(turnTab, &turnTabObj);
 	lv_obj_set_user_data(swingTab, &swingTabObj);
 	lv_obj_set_user_data(headingTab, &headingTabObj);
+	lv_obj_set_user_data(odomTab, &odomTabObj);
 
 	lv_obj_add_event_cb(pidTabview, SelectTab, LV_EVENT_VALUE_CHANGED, nullptr);
 }

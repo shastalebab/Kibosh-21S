@@ -3,7 +3,7 @@
 #include "EZ-Template/api.hpp"
 #include "EZ-Template/util.hpp"
 
-const double WHEEL_DIAMETER = 3.2175;
+const double WHEEL_DIAMETER = 3.3369184232;
 const double ROBOT_WIDTH = 11.4375;
 const int KEY = 267267;
 

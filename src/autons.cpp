@@ -1,7 +1,4 @@
-#include "autons.hpp"
-#include "drive.hpp"
 #include "main.h"  // IWYU pragma: keep
-#include "subsystems.hpp"
 
 // Commonly used speed constants
 const int DRIVE_SPEED = 127;
@@ -19,7 +16,7 @@ void default_constants() {
 	chassis.pid_turn_constants_set(4.0, 0.15, 29.5,
 								   30.0);				// Turn in place constants
 	chassis.pid_swing_constants_set(6.75, 0.0, 57.75);	// Swing constants
-	chassis.pid_odom_angular_constants_set(6.25, 0.1, 39.25);			   // Angular control for odom motions
+	chassis.pid_odom_angular_constants_set(6.25, 0.1, 78.5);			   // Angular control for odom motions
 	chassis.pid_odom_boomerang_constants_set(5.8, 0.0, 32.5);  // Angular control for boomerang motions
 	chassis.pid_drive_constants_get();
 
@@ -27,8 +24,8 @@ void default_constants() {
 	chassis.pid_turn_exit_condition_set(50_ms, 3_deg, 170_ms, 9_deg, 150_ms, 150_ms, false);
 	chassis.pid_swing_exit_condition_set(70_ms, 3_deg, 250_ms, 7_deg, 500_ms, 500_ms, false);
 	chassis.pid_drive_exit_condition_set(70_ms, 1.7_in, 180_ms, 4_in, 200_ms, 200_ms, false);
-	chassis.pid_odom_turn_exit_condition_set(40_ms, 3_deg, 170_ms, 6_deg, 500_ms, 750_ms, false);
-	chassis.pid_odom_drive_exit_condition_set(70_ms, 1.7_in, 180_ms, 4_in, 200_ms, 200_ms, false);
+	chassis.pid_odom_turn_exit_condition_set(60_ms, 2_deg, 170_ms, 6_deg, 500_ms, 750_ms, false);
+	chassis.pid_odom_drive_exit_condition_set(80_ms, .9_in, 170_ms, 2.7_in, 200_ms, 200_ms, false);
 	chassis.pid_turn_chain_constant_set(4_deg);
 	chassis.pid_swing_chain_constant_set(5_deg);
 	chassis.pid_drive_chain_constant_set(4_in);
@@ -78,7 +75,11 @@ void odom_test(int degrees) {
 	chassis.pid_odom_set({{0_in, 24_in}, fwd, DRIVE_SPEED});
 }
 
-void constants_test() { moveToPoint({0, 24}, fwd, 127); }
+void constants_test() { 
+	//setPosition(59.64, 20.33, -25);
+	//moveToPoint({24, 24}, fwd, 127); 
+	setPosition(7.21875, 9.25, 180);
+	}
 
 //
 // RIGHT AUTONS
@@ -87,42 +88,41 @@ void constants_test() { moveToPoint({0, 24}, fwd, 127); }
 void right_split() {}
 
 void right_greed() {
-	setPosition(85.584, 21.255, 25);
+	setPosition(83.13, 20.1, 25);
 	// Collect middle three blocks and blocks under long goal
 	driveSet(42, 80);
 	setIntake(127, true);
 	pidWait(WAIT);
 	setRedirect(true);
-	moveToPoint({118.36, 64}, rev, DRIVE_SPEED);
+	moveToPoint({120.36, 62}, rev, DRIVE_SPEED);
 	setIntake(127, true);
 	pidWait(WAIT);
 	// Align to loader/long goal
-	moveToPoint({96, 48}, fwd, DRIVE_SPEED);
+	moveToPoint({96, 47.25}, fwd, DRIVE_SPEED);
 	pidWait(WAIT);
-	moveToPoint({121, 24}, rev, DRIVE_SPEED);
-	setScraper(true);
+	moveToPoint({122.5, 24}, rev, DRIVE_SPEED);
 	setRedirect(false);
 	pidWait(WAIT);
 	turnSet(0, TURN_SPEED);
 	pidWait(WAIT);
+	setScraper(true);
 	// Intake blocks from loader
-	driveSet(-19, 90);
-	delayMillis(600);
-	chassis.drive_set(0, 0);
-	delayMillis(800);
+	driveSet(-19, 70);
+	delayMillis(1400);
+	if(autonMode != BRAIN) setPosition(120, chassis.odom_y_get());
+	turnSet(1, TURN_SPEED);
 	// Score on long goal
-	moveToPoint({123, 39.5}, fwd, DRIVE_SPEED);
-	delayMillis(300);
-	setScraper(false);
+	driveSet(27, DRIVE_SPEED);
 	delayMillis(200);
+	setScraper(false);
 	setAligner(true);
 	pidWait(WAIT);
 	chassis.drive_set(0, 0);
 	setIntake(127, false);
 	// Push blocks into center with wing
-	delayMillis(2800);
+	delayMillis(3000);
 	setIntake(127, true);
-	swingSet(RIGHT_SWING, 90, SWING_SPEED, 40);
+	swingSet(RIGHT_SWING, 100, DRIVE_SPEED, 30);
 	pidWait(WAIT);
 	turnSet(0, TURN_SPEED);
 	pidWait(WAIT);
@@ -134,61 +134,61 @@ void right_greed() {
 }
 
 void right_awp() {
-	setPosition(79.5, 24.75, 90);
-	// Clear matchloader & score on long goal
-	moveToPoint({120, 24}, fwd, DRIVE_SPEED);
-	pidWaitUntil(20_in);
-	setScraper(true);
+	setPosition(79.5, 24.75, -90);
+	// Matchload and score
+	moveToPoint({120, 24}, rev, DRIVE_SPEED);
 	pidWait(WAIT);
 	turnSet(0, TURN_SPEED);
-	pidWait(WAIT);
+	setScraper(true);
 	setIntake(127, true);
-	// Grab blocks from loader and score on long goal
-	driveSet(-17, 110);
-	delayMillis(600);
-	chassis.drive_set(0, 0);
-	delayMillis(400);
+	pidWait(WAIT);
+	// Intake blocks from loader
+	driveSet(-19, 70);
+	delayMillis(1100);
+	if(autonMode != BRAIN) setPosition(120, chassis.odom_y_get());
+	// Score on long goal
+	moveToPoint({120.75, 38}, fwd, DRIVE_SPEED);
+	delayMillis(200);
 	setScraper(false);
-	driveSet(26.25, DRIVE_SPEED);
-	delayMillis(300);
 	setAligner(true);
 	pidWait(WAIT);
 	chassis.drive_set(0, 0);
 	setIntake(127, false);
-	delayMillis(1000);
+	// Cross field and score on middle goal
+	delayMillis(500);
 	setIntake(127, true);
-	driveSet(-8, DRIVE_SPEED);
-	setAligner(false);
-	pidWait(WAIT);
-	// Score blocks on middle goal
-	setRedirect(true);
+	delayMillis(100);
+	swingSet(ez::RIGHT_SWING, 90, SWING_SPEED);
+	pidWait(CHAIN);
 	moveToPoint({96, 48}, rev, DRIVE_SPEED);
 	pidWait(WAIT);
-	moveToPoint({48, 48}, rev, DRIVE_SPEED);
+	moveToPoint({48, 47.25}, rev, 110);
 	pidWait(WAIT);
 	turnSet(45, TURN_SPEED);
 	pidWait(WAIT);
-	driveSet(7.5, 90);
-	pidWaitUntil(3.5_in);
-	setIntake(127, false);
-	pidWait(WAIT);
-	delayMillis(1000);
-	// Go to other loader
+	setRedirect(true);
+	setAligner(false);
+	driveSet(11, DRIVE_SPEED);
+	delayMillis(200);
+	setIntake(110, false);
+	delayMillis(700);
 	setIntake(127, true);
-	moveToPoint({24, 32}, rev, DRIVE_SPEED);
 	pidWait(WAIT);
+	// Align to loader/long goal
+	moveToPoint({23.5, 24}, rev, DRIVE_SPEED);
+	setScraper(true);
 	setRedirect(false);
+	pidWait(WAIT);
 	turnSet(0, TURN_SPEED);
 	pidWait(WAIT);
-	setScraper(true);
-	// Grab blocks from loader and score on long goal
-	driveSet(-32, 90);
-	delayMillis(600);
-	chassis.drive_set(0, 0);
-	delayMillis(400);
+	// Intake blocks from loader
+	driveSet(-19, 70);
+	delayMillis(1100);
+	if(autonMode != BRAIN) setPosition(23.5, chassis.odom_y_get());
+	// Score on long goal
+	moveToPoint({22.75, 38}, fwd, DRIVE_SPEED);
+	delayMillis(200);
 	setScraper(false);
-	driveSet(26.25, DRIVE_SPEED);
-	delayMillis(300);
 	setAligner(true);
 	pidWait(WAIT);
 	chassis.drive_set(0, 0);
@@ -200,49 +200,50 @@ void right_awp() {
 //
 
 void left_split() {
-	setPosition(58.416, 21.255, -25);
+	setPosition(60.87, 20.1, -25);
 	// Collect middle three blocks and blocks under long goal
 	driveSet(42, 80);
 	setIntake(127, true);
 	pidWait(WAIT);
 	setRedirect(true);
-	moveToPoint({25.64, 64}, rev, DRIVE_SPEED);
+	moveToPoint({23.64, 62}, rev, DRIVE_SPEED);
 	setIntake(127, true);
 	pidWait(WAIT);
 	// Score blocks on middle goal
-	moveToPoint({48, 48}, fwd, DRIVE_SPEED);
+	moveToPoint({48, 46.75}, fwd, DRIVE_SPEED);
 	pidWait(WAIT);
 	turnSet(45, TURN_SPEED);
 	pidWait(WAIT);
-	moveToPoint({53.25, 53.25}, fwd, DRIVE_SPEED);
+	driveSet(8.75, DRIVE_SPEED);
 	delayMillis(200);
-	setIntake(127, false);
-	delayMillis(900);
+	setIntake(110, false);
+	delayMillis(800);
 	setIntake(127, true);
+	delayMillis(200);
 	pidWait(WAIT);
 	// Align to loader/long goal
-	moveToPoint({24, 24}, rev, DRIVE_SPEED);
+	moveToPoint({21.5, 24}, rev, DRIVE_SPEED);
 	setScraper(true);
 	setRedirect(false);
 	pidWait(WAIT);
 	turnSet(0, TURN_SPEED);
 	pidWait(WAIT);
 	// Intake blocks from loader
-	driveSet(-19, 90);
-	delayMillis(600);
-	chassis.drive_set(0, 0);
-	delayMillis(800);
+	driveSet(-19, 70);
+	delayMillis(1400);
+	if(autonMode != BRAIN) setPosition(24, chassis.odom_y_get());
+	turnSet(1, TURN_SPEED);
+	pidWait(WAIT);
 	// Score on long goal
-	moveToPoint({24, 39.5}, fwd, DRIVE_SPEED);
-	delayMillis(300);
-	setScraper(false);
+	driveSet(27, DRIVE_SPEED);
 	delayMillis(200);
+	setScraper(false);
 	setAligner(true);
 	pidWait(WAIT);
 	chassis.drive_set(0, 0);
 	setIntake(127, false);
 	// Push blocks into center with wing
-	delayMillis(2800);
+	delayMillis(2000);
 	setIntake(127, true);
 	swingSet(RIGHT_SWING, 100, DRIVE_SPEED, 30);
 	pidWait(WAIT);
@@ -256,42 +257,42 @@ void left_split() {
 }
 
 void left_greed() {
-	setPosition(58.416, 21.255, -25);
+	setPosition(60.87, 20.1, -25);
 	// Collect middle three blocks and blocks under long goal
 	driveSet(42, 80);
 	setIntake(127, true);
 	pidWait(WAIT);
 	setRedirect(true);
-	moveToPoint({25.64, 64}, rev, DRIVE_SPEED);
+	moveToPoint({23.64, 62}, rev, DRIVE_SPEED);
 	setIntake(127, true);
 	pidWait(WAIT);
 	// Align to loader/long goal
-	moveToPoint({48, 48}, fwd, DRIVE_SPEED);
+	moveToPoint({48, 47.25}, fwd, DRIVE_SPEED);
 	pidWait(WAIT);
-	moveToPoint({23, 24}, rev, DRIVE_SPEED);
+	moveToPoint({22, 24}, rev, DRIVE_SPEED);
 	setScraper(true);
 	setRedirect(false);
 	pidWait(WAIT);
 	turnSet(0, TURN_SPEED);
 	pidWait(WAIT);
 	// Intake blocks from loader
-	driveSet(-19, 90);
+	driveSet(-19, 70);
 	delayMillis(600);
-	chassis.drive_set(0, 0);
+	//chassis.drive_set(0, 0);
 	delayMillis(800);
+	if(autonMode != BRAIN) setPosition(24.75, chassis.odom_y_get());
 	// Score on long goal
-	moveToPoint({21, 39.5}, fwd, DRIVE_SPEED);
-	delayMillis(300);
-	setScraper(false);
+	moveToPoint({24, 38}, fwd, DRIVE_SPEED);
 	delayMillis(200);
+	setScraper(false);
 	setAligner(true);
 	pidWait(WAIT);
 	chassis.drive_set(0, 0);
 	setIntake(127, false);
 	// Push blocks into center with wing
-	delayMillis(2800);
+	delayMillis(3000);
 	setIntake(127, true);
-	swingSet(RIGHT_SWING, 90, SWING_SPEED, 40);
+	swingSet(RIGHT_SWING, 100, DRIVE_SPEED, 30);
 	pidWait(WAIT);
 	turnSet(0, TURN_SPEED);
 	pidWait(WAIT);

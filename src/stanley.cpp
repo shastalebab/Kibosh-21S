@@ -1,7 +1,4 @@
-#include "EZ-Template/util.hpp"
-#include "drive.hpp"
 #include "main.h"  // IWYU pragma: keep
-#include "pros/rtos.hpp"
 
 Stanley stanley({16.5, 0.0, 170.25}, {4.0, 0.15, 29.5, 30.0}, {3, 70}, 10.0);
 

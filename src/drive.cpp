@@ -1,5 +1,4 @@
 #include "main.h"  // IWYU pragma: keep
-#include "okapi/api/units/QLength.hpp"
 
 // Global variable definitions
 AutonMode autonMode = BRAIN;
