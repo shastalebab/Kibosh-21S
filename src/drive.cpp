@@ -107,6 +107,7 @@ std::vector<Coordinate> injectPoint(Coordinate startPoint, Coordinate endPoint, 
 			// Inject points along straight line
 			while(getDistance(startPoint, newPoint) < getDistance(startPoint, endPoint)) {
 				newPoint = getPoint(startPoint, iter);
+				newPoint.t = getTheta(startPoint, endPoint, left < 0 ? rev : fwd);
 				newPoint.left = left;
 				newPoint.right = right;
 				iter += lookAhead;
@@ -140,10 +141,13 @@ std::vector<Coordinate> injectPath(std::vector<Coordinate> coordList, double loo
 void setPosition(double x, double y) { setPosition(x, y, currentPoint.t); }
 
 void setPosition(double x, double y, double t) {
+	if(autonMode != BRAIN) {
+		chassis.odom_xyt_set(x, y, t);
+		pros::delay(10);
+	}
 	currentPoint.x = x;
 	currentPoint.y = y;
 	currentPoint.t = t;
-	if(autonMode != BRAIN) chassis.odom_xyt_set(currentPoint.x, currentPoint.y, t);
 	autonPath.push_back(currentPoint);
 }
 

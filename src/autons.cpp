@@ -77,8 +77,8 @@ void odom_test(int degrees) {
 
 void constants_test() { 
 	//setPosition(59.64, 20.33, -25);
-	//moveToPoint({24, 24}, fwd, 127); 
-	setPosition(7.21875, 9.25, 180);
+	moveToPoint({24, 24}, fwd, 127); 
+	//setPosition(7.21875, 9.25, 180);
 	}
 
 //
@@ -100,19 +100,19 @@ void right_greed() {
 	// Align to loader/long goal
 	moveToPoint({96, 47.25}, fwd, DRIVE_SPEED);
 	pidWait(WAIT);
-	moveToPoint({122.5, 24}, rev, DRIVE_SPEED);
+	moveToPoint({122, 24}, rev, DRIVE_SPEED);
 	setRedirect(false);
 	pidWait(WAIT);
 	turnSet(0, TURN_SPEED);
 	pidWait(WAIT);
 	setScraper(true);
 	// Intake blocks from loader
-	driveSet(-19, 70);
+	driveSet(-20, 90);
 	delayMillis(1400);
 	if(autonMode != BRAIN) setPosition(120, chassis.odom_y_get());
 	turnSet(1, TURN_SPEED);
 	// Score on long goal
-	driveSet(27, DRIVE_SPEED);
+	driveSet(29, DRIVE_SPEED);
 	delayMillis(200);
 	setScraper(false);
 	setAligner(true);
@@ -210,13 +210,13 @@ void left_split() {
 	setIntake(127, true);
 	pidWait(WAIT);
 	// Score blocks on middle goal
-	moveToPoint({48, 46.75}, fwd, DRIVE_SPEED);
+	moveToPoint({47.5, 46.25}, fwd, DRIVE_SPEED);
 	pidWait(WAIT);
 	turnSet(45, TURN_SPEED);
 	pidWait(WAIT);
-	driveSet(8.75, DRIVE_SPEED);
+	driveSet(10.5, DRIVE_SPEED);
 	delayMillis(200);
-	setIntake(110, false);
+	setIntake(95, false);
 	delayMillis(800);
 	setIntake(127, true);
 	delayMillis(200);
@@ -229,13 +229,13 @@ void left_split() {
 	turnSet(0, TURN_SPEED);
 	pidWait(WAIT);
 	// Intake blocks from loader
-	driveSet(-19, 70);
+	driveSet(-19, 90);
 	delayMillis(1400);
-	if(autonMode != BRAIN) setPosition(24, chassis.odom_y_get());
-	turnSet(1, TURN_SPEED);
+	if(autonMode != BRAIN) setPosition(23, chassis.odom_y_get());
+	turnSet({24, 48}, fwd,  TURN_SPEED);
 	pidWait(WAIT);
 	// Score on long goal
-	driveSet(27, DRIVE_SPEED);
+	driveSet(27.75, DRIVE_SPEED);
 	delayMillis(200);
 	setScraper(false);
 	setAligner(true);
@@ -251,7 +251,7 @@ void left_split() {
 	pidWait(WAIT);
 	setWing(true);
 	setDescore(false);
-	driveSet(40, 75);
+	driveSet(36, 75);
 	pidWait(WAIT);
 	chassis.drive_set(0, 0);
 }

@@ -5,13 +5,22 @@
 #include "drive.hpp"
 
 class Stanley {
+	private:
+	double crosstrack(Coordinate cur, Coordinate min);
+	double xy_error(Coordinate cur, Coordinate target);
+	double xy_current_fake;
+	double new_current_fake;
+	double xy_delta_fake;
+	double xy_last_fake;
+	bool was_stanley_just_set;
+	int sgn_init;
    public:
 	vector<Coordinate> stanleyPoints = {};
 	double ke;
 	PID stanleyDrivePID;
 	PID stanleyTurnPID;
-	slew slewLeft;
-	slew slewRight;
+	slew slewLeft = slew(3, 60);
+	slew slewRight = slew(3, 60);
     
     bool active;
 
@@ -25,8 +34,8 @@ class Stanley {
 		stanleyPoints = {};
 		stanleyDrivePID = {16.5, 0.0, 170.25};
 		stanleyTurnPID = {6.25, 0.1, 39.25};
-		slewLeft = {3, 70};
-		slewRight = {3, 70};
+		slewLeft = ez::slew(3, 60);
+		slewRight = ez::slew(3, 60);
 		ke = 3.0;
         active = false;
 	}
