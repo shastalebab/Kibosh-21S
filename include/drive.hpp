@@ -54,6 +54,7 @@ void delayMillis(int millis);
 void delayMillis(int millis, bool ignore);
 
 // Move to point wrappers
+void moveToPoint(Coordinate newpoint, drive_directions direction, int speed, bool slew);
 void moveToPoint(Coordinate newpoint, ez::drive_directions direction, int speed);
 
 // Drive set wrappers

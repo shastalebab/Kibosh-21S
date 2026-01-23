@@ -66,7 +66,7 @@ pair<double, double> Stanley::compute() {
 	int flipped = util::sgn(temp_target) != util::sgn(sgn_init) ? -1 : 1;  // Check if we've flipped directions to what we started
 
 	// Compute xy PID
-	xy_current_fake = fabs(xy_error(cur, {0.0, 0.0}));
+	xy_current_fake = fabs(xy_error(cur, min));
 	if(!was_stanley_just_set)
 		xy_delta_fake = fabs(xy_current_fake - xy_last_fake);
 	else
@@ -81,10 +81,10 @@ pair<double, double> Stanley::compute() {
 	this->slewRight.iterate(chassis.drive_sensor_right());
 
 	// Calculate main (left) output voltage
-	double l_out = this->stanleyTurnPID.compute(chassis.odom_theta_get()) + this->stanleyDrivePID.compute(getDistance(this->stanleyPoints.front(), cur));
+	double l_out = this->stanleyTurnPID.compute(chassis.odom_theta_get()) + this->stanleyDrivePID.output;
 
 	// Setup ackermann turning radius and wheel velocities to calculate right output
-	double radius = 9.5 / tan(output_t * (M_PI / 180));
+	double radius = 4.75 / tan(output_t * (M_PI / 180));
 	double v_left = getVelocity(l_out);
 	double v_right = ((2 * radius * v_left) + (ROBOT_WIDTH * v_left)) / ((2 * radius) - ROBOT_WIDTH);
 	if(tan(output_t * (M_PI / 180)) == 0) v_right = v_left;
@@ -104,6 +104,38 @@ pair<double, double> Stanley::compute() {
 	return {l_out, r_out};
 }
 
+void Stanley::drive_set_path(vector<Coordinate> points, drive_directions dir, int speed, bool slew) {
+	// Set up path
+	Coordinate cur = {chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()};
+	this->stanleyPoints = points;
+
+	// Wrap angles to be between 0 and 360
+	cur.t = util::wrap_angle(cur.t);
+	points[0].t = util::wrap_angle(points[0].t);
+	if(cur.t < 0) cur.t += 360;
+	if(points[0].t < 0) points[0].t += 360;
+
+	// Identify crosstrack error, heading error, and velocity
+	double ct_error = crosstrack(cur, points[0]);
+	double delta_t = cur.t - points[0].t;
+	double velocity = (fabs(chassis.drive_velocity_left()) + fabs(chassis.drive_velocity_right())) / 2;
+
+	// Calculate heading output and set PID targets
+	double output_t = delta_t + ((atan2(ct_error * this->ke, velocity)) * M_PI / 180);
+
+	this->stanleyTurnPID.target_set(output_t);
+	this->stanleyDrivePID.target_set(getDistance(cur, this->stanleyPoints.back()));
+
+	// Restart timers and initialize PID/slew
+	active = true;
+	chassis.drive_mode_set(DISABLE);
+	sgn_init = util::sgn(xy_error(points[points.size() - 2], points.back()));
+	this->stanleyTurnPID.timers_reset();
+	this->stanleyDrivePID.timers_reset();
+	this->slewLeft.initialize(slew, speed, chassis.drive_sensor_left() + getDistance(cur, points.back()), chassis.drive_sensor_left());
+	this->slewRight.initialize(slew, speed, chassis.drive_sensor_right() + getDistance(cur, points.back()), chassis.drive_sensor_right());
+}
+
 void Stanley::drive_set_point(Coordinate point, drive_directions dir, int speed, bool slew) {
 	// Set up path
 	Coordinate cur = {chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()};
@@ -117,12 +149,12 @@ void Stanley::drive_set_point(Coordinate point, drive_directions dir, int speed,
 	if(point.t < 0) point.t += 360;
 
 	// Identify crosstrack error, heading error, and velocity
-	double crosstrack = getDistance(cur, point);
+	double ct_error = crosstrack(cur, point);
 	double delta_t = cur.t - point.t;
 	double velocity = (fabs(chassis.drive_velocity_left()) + fabs(chassis.drive_velocity_right())) / 2;
 
 	// Calculate heading output and set PID targets
-	double output_t = delta_t + ((atan2(crosstrack * this->ke, velocity)) * M_PI / 180);
+	double output_t = delta_t + ((atan2(ct_error * this->ke, velocity)) * M_PI / 180);
 
 	this->stanleyTurnPID.target_set(output_t);
 	this->stanleyDrivePID.target_set(getDistance(cur, this->stanleyPoints.back()));
@@ -154,12 +186,12 @@ void Stanley::drive_set(double distance, int speed, bool slew) {
 	if(point.t < 0) point.t += 360;
 
 	// Identify crosstrack error, heading error, and velocity
-	double crosstrack = getDistance(cur, point);
+	double ct_error = crosstrack(cur, point);
 	double delta_t = cur.t - point.t;
 	double velocity = (fabs(chassis.drive_velocity_left()) + fabs(chassis.drive_velocity_right())) / 2;
 
 	// Calculate heading output and set PID targets
-	double output_t = delta_t + ((atan2(crosstrack * this->ke, velocity)) * M_PI / 180);
+	double output_t = delta_t + ((atan2(ct_error * this->ke, velocity)) * M_PI / 180);
 
 	this->stanleyTurnPID.target_set(output_t);
 	this->stanleyDrivePID.target_set(getDistance(cur, this->stanleyPoints.back()));

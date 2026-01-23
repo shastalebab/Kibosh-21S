@@ -5,6 +5,7 @@
 //
 
 Colors allianceColor = NEUTRAL;
+Sorting primed = UNPRIMED;
 void setAlliance(Colors alliance) { allianceColor = alliance; }
 
 void colorToggle() {
@@ -16,6 +17,12 @@ void colorToggle() {
 		allianceColor = NEUTRAL;
 	colorSet(allianceColor, allianceInd);
 }
+
+void setSortPrime(Sorting state) {
+	primed = state;
+}
+
+Sorting getSortPrime() { return primed; }
 
 void colorSet(Colors color, lv_obj_t* object) {
 	// Set on screen elements to the corresponding color
@@ -46,8 +53,6 @@ bool colorCompare(Colors color) {
 
 void colorTask() {
 	Colors color;
-	int sortTime = 0;
-	bool sleep = false;
 	while(true) {
 		colorSens.set_integration_time(10);
 		proximitySens.set_integration_time(10);
@@ -55,19 +60,16 @@ void colorTask() {
 		proximitySens.set_led_pwm(50);
 		color = colorGet();
 		colorSet(color, colorInd);
-		if(!pros::competition::is_disabled()) {
-			if(colorCompare(color) && !sleep) {
-				if(sortTime < 10) {
-					//setDescore(false);
+		if(!pros::competition::is_disabled() && colorCompare(color)) {
+			if(primed == PRIMED) {
+					setIntake(intakeFront.target, 0);
+					primed = UNPRIMED;
                     pros::delay(250);
-					sortTime++;
-				} else {
-					sleep = true;
-				}
-			} else {
-				sortTime = 0;
-				sleep = false;
-                //setDescore(true);
+			} else if(primed == DELAYED) {
+					delayMillis(400);
+					setIntake(intakeFront.target, 0);
+					primed = UNPRIMED;
+                    pros::delay(250);
 			}
 		}
 		pros::delay(10);

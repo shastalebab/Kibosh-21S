@@ -18,13 +18,17 @@ void setIntake(int speed, bool indexer_on) {
 	}
 }
 
-void setIntake(int speed) {
+void setIntake(int front, int back) {
 	if(autonMode != BRAIN) {
-		if(intakeFront.lock != true) intakeFront.motors[0]->move(speed);
-		if(intakeBack.lock != true) intakeBack.motors[0]->move(speed);
-		intakeFront.target = speed;
-		intakeBack.target = speed;
+		if(intakeFront.lock != true) intakeFront.motors[0]->move(front);
+		if(intakeBack.lock != true) intakeBack.motors[0]->move(back);
+		intakeFront.target = front;
+		intakeBack.target = back;
 	}
+}
+
+void setIntake(int speed) {
+	setIntake(speed, speed);
 }
 
 void setRedirect(bool state) {

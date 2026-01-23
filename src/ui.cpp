@@ -156,8 +156,8 @@ MotorTab swingTabObj = MotorTab("swing PID", theme_color, &chassis.swingPID.erro
 								PidTunerValues(0.25, 0.05, 0.25, &chassis.fwd_rev_swingPID), swingTab);
 MotorTab headingTabObj = MotorTab("heading PID", theme_color, &chassis.turnPID.error, 180, chassisMotors, heading_test, true,
 								  PidTunerValues(0.25, 0.05, 0.25, &chassis.headingPID), headingTab);
-MotorTab odomTabObj = MotorTab("odom PID", theme_color, &chassis.odom_angularPID.error, 135, chassisMotors, odom_test, true,
-							   PidTunerValues(0.25, 0.05, 0.25, &chassis.odom_angularPID), odomTab);
+MotorTab odomTabObj = MotorTab("odom PID", theme_color, &chassis.xyPID.error, 135, chassisMotors, odom_test, true,
+							   PidTunerValues(0.25, 0.05, 0.25, &chassis.fwd_rev_drivePID), odomTab);
 
 MotorTab* selectedTabObj = &driveTabObj;
 

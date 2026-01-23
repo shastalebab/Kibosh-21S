@@ -25,14 +25,18 @@ void initialize() {
 	default_constants();
 
 	// Add autons to auton selector
-	auton_sel.selector_populate({{right_greed, "right_greed", "right side 9 in long goal", lv_color_darken(green, 60)},
-								 {left_greed, "left_greed", "left side 9 in long goal", green},
-								 {left_split, "left_split", "left side 4 + 5", lv_color_lighten(gray, 125)},
+	auton_sel.selector_populate({{right_split, "right_split", "right side 3 + 6", gray},
+								 {left_split, "left_split", "left side 3 + 6", lv_color_lighten(gray, 125)},
 								 {right_awp, "right_awp", "right side 4 + 6 + 3 solo AWP", violet},
-								 {left_awp, "left_awp", "left side 4 + 3 + 6 solo AWP", pink},
-								 {constants_test, "constants_test", "drive and turn", blue},
+								 //{right_greed, "right_greed", "right side 9 in long goal", lv_color_darken(green, 60)},
+								 //{left_greed, "left_greed", "left side 9 in long goal", green},
+								 {right_rush, "right_rush", "right side 7 in long goal", lv_color_darken(red, 60)},
+								 {left_rush, "left_rush", "left side 7 in long goal", lv_color_darken(red, 30)},
+								 //{right_superrush, "right_rush", "right side 4 in long goal", lv_color_lighten(red, 30)},
+								// {left_superrush, "left_superrush", "left side 4 in long goal", lv_color_lighten(red, 60)},
 								 {skills, "skills", "skills route", lv_color_darken(blue, 60)},
-								 {skills_awp, "skills_awp", "awp route but for skills", lv_color_lighten(blue, 60)}});
+								 {skills_awp, "skills_awp", "awp route but for skills", lv_color_lighten(blue, 60)},
+								 {constants_test, "constants_test", "drive and turn", blue}});
 
 	// Initialize chassis
 	chassis.initialize();

@@ -25,6 +25,8 @@ void constants_test();
 
 void right_split();
 void right_greed();
+void right_rush();
+void right_superrush();
 void right_awp();
 
 //
@@ -33,6 +35,8 @@ void right_awp();
 
 void left_split();
 void left_greed();
+void left_rush();
+void left_superrush();
 void left_awp();
 
 //

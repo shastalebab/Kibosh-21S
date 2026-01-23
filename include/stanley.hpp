@@ -25,6 +25,7 @@ class Stanley {
     bool active;
 
 	pair<double, double> compute();
+	void drive_set_path(vector<Coordinate> points, drive_directions dir, int speed, bool slew);
 	void drive_set_point(Coordinate point, drive_directions dir, int speed, bool slew);
     void drive_set(double distance, int speed, bool slew);
 	void drive_wait_until(double distance);

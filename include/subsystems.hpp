@@ -17,11 +17,10 @@ inline pros::Distance distanceSens(8);
 
 inline pros::Motor intakeFirst(-1);
 inline pros::Motor intakeSecond(10);
-inline pros::MotorGroup intakelalala({1, 2, 3});
 inline ez::Piston scraper('D');
 inline ez::Piston wing('B');
 inline ez::Piston indexer('H');
-inline ez::Piston descore('G');
+inline ez::Piston descore('G', true);
 inline ez::Piston redirect('E');
 inline ez::Piston aligner('F');
 inline ez::Piston brakes('G');
@@ -66,6 +65,7 @@ class Jammable {
 };
 
 enum Colors { BLUE = 0, NEUTRAL = 1, RED = 2 };
+enum Sorting {UNPRIMED = 0, PRIMED = 1, DELAYED = 2};
 
 extern Colors allianceColor;
 extern Jammable intakeFront;
@@ -74,6 +74,7 @@ extern Jammable intakeBack;
 bool shift();
 
 void setIntake(int speed, bool indexer_on);
+void setIntake(int front, int back);
 void setIntake(int speed);
 
 void setRedirect(bool state);
@@ -86,6 +87,8 @@ void setBrakes(bool state);
 void setAlliance(Colors alliance);
 void colorToggle();
 void colorSet(Colors color, lv_obj_t* object);
+void setSortPrime(Sorting state);
+Sorting getSortPrime();
 
 void sendHaptic(string input);
 

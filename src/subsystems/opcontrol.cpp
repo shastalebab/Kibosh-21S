@@ -1,10 +1,10 @@
 #include "main.h"  // IWYU pragma: keep
 
-
 //
 // Operator control
 //
 
+bool SKILLS = false;
 bool interruptintake = false;
 bool interruptDescore = false;
 bool interruptDrive = false;
@@ -19,10 +19,12 @@ void setIntakeOp() {
 
 	if(interruptintake) return;
 
-	if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {	 // storing/scoring
+	if(SKILLS && redirect.get() && master.get_digital(pros::E_CONTROLLER_DIGITAL_L1) && shift()) {	// mid goal scoring for skills
+		setIntake(67, false);
+	} else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {	// storing/scoring
 		setIntake(127, !shift());
 	} else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {	// low goal slow/fast
-		setIntake(shift() ? -127 : -90);
+		setIntake(shift() ? -127 : -90, shift());
 	} else {  // at rest
 		setIntake(0);
 		intakeFront.lock = false;
@@ -37,7 +39,10 @@ void setRedirectOp() {
 			sendHaptic("--");
 			return;
 		}
-		if(aligner.get()) aligner.set(false);
+		if(aligner.get() && !SKILLS)
+			aligner.set(false);
+		else if(SKILLS && !redirect.get())
+			aligner.set(true);
 		redirect.set(!redirect.get());
 	}
 }

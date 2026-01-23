@@ -244,8 +244,51 @@ void delayMillis(int millis) { delayMillis(millis, false); }
 // Move to point wrappers
 //
 
-void moveToPoint(Coordinate newpoint, drive_directions direction, int speed) {
+void moveThroughPoints(vector<Coordinate> points, drive_directions direction, int speed) {
 	bool slew_state = false;
+	vector<odom> points_ez = {};
+	switch(autonMode) {
+		case PLAIN:
+			for(auto point : points) {
+				turnSet(getTheta({chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()}, point, direction), speed);
+				&point != &points.back() ? pidWait(CHAIN) : pidWait(WAIT);
+				driveSet((getDistance({chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()}, point) * (direction == rev ? -1 : 1)), speed);
+				if(&point != &points.back()) pidWait(CHAIN);
+			}
+			break;
+		case ODOM:
+			currentPoint.t = getTheta({currentPoint.x, currentPoint.y}, points[0], direction);
+			currentPoint.x = points[0].x;
+			currentPoint.y = points[0].y;
+			currentPoint.left = speed * (direction == fwd ? 1 : -1);
+			currentPoint.right = speed * (direction == fwd ? 1 : -1);
+			autonPath.push_back(currentPoint);
+			for(auto point : points) {
+				odom point_ez = {{point.x, point.y, point.t}, direction, speed};
+				points_ez.push_back(point_ez);
+			}
+			chassis.pid_odom_set(points_ez);
+			break;
+		case STANLEY:
+			currentPoint.t = getTheta({currentPoint.x, currentPoint.y}, points[0], direction);
+			currentPoint.x = points[0].x;
+			currentPoint.y = points[0].y;
+			currentPoint.left = speed * (direction == fwd ? 1 : -1);
+			currentPoint.right = speed * (direction == fwd ? 1 : -1);
+			autonPath.push_back(currentPoint);
+			stanley.drive_set_path(injectPath(points, .5), direction, speed, getDistance(currentPoint, points.back()) > 18 ? true : false);
+			break;
+		default:
+			for(auto point : points) {
+				turnSet(getTheta(currentPoint, point, direction), speed);
+				pidWait(WAIT);
+				driveSet((getDistance(currentPoint, point) * (direction == rev ? -1 : 1)), speed);
+			}
+			break;
+	}
+}
+
+void moveToPoint(Coordinate newpoint, drive_directions direction, int speed, bool slew) {
 	switch(autonMode) {
 		case PLAIN:
 			turnSet(getTheta({chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()}, newpoint, direction), speed);
@@ -259,7 +302,7 @@ void moveToPoint(Coordinate newpoint, drive_directions direction, int speed) {
 			currentPoint.left = speed * (direction == fwd ? 1 : -1);
 			currentPoint.right = speed * (direction == fwd ? 1 : -1);
 			autonPath.push_back(currentPoint);
-			chassis.pid_odom_set({{newpoint.x, newpoint.y}, direction, speed});
+			chassis.pid_odom_set({{newpoint.x, newpoint.y}, direction, speed}, slew);
 			break;
 		case STANLEY:
 			currentPoint.t = getTheta({currentPoint.x, currentPoint.y}, newpoint, direction);
@@ -268,7 +311,7 @@ void moveToPoint(Coordinate newpoint, drive_directions direction, int speed) {
 			currentPoint.left = speed * (direction == fwd ? 1 : -1);
 			currentPoint.right = speed * (direction == fwd ? 1 : -1);
 			autonPath.push_back(currentPoint);
-			stanley.drive_set_point(newpoint, direction, speed, getDistance(currentPoint, newpoint) > 18 ? true : false);
+			stanley.drive_set_point(newpoint, direction, speed, slew);
 			break;
 		default:
 			turnSet(getTheta(currentPoint, newpoint, direction), speed);
@@ -276,6 +319,12 @@ void moveToPoint(Coordinate newpoint, drive_directions direction, int speed) {
 			driveSet((getDistance(currentPoint, newpoint) * (direction == rev ? -1 : 1)), speed);
 			break;
 	}
+}
+
+void moveToPoint(Coordinate newpoint, drive_directions direction, int speed) {
+	bool slew_state = false;
+	if(getDistance(currentPoint, newpoint) > 48) slew_state = true;
+	moveToPoint(newpoint, direction, speed, slew_state);
 }
 
 //
