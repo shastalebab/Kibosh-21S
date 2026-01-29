@@ -43,7 +43,8 @@ std::vector<Coordinate> injectPath(std::vector<Coordinate> coordList, double loo
 // Set position wrappers
 void setPosition(double x, double y);
 void setPosition(double x, double y, double t);
-double getDistanceActual();
+double getDistanceActualBack();
+double getDistanceActualSide();
 
 // Wait wrappers
 void pidWait(Wait type);
@@ -54,6 +55,8 @@ void delayMillis(int millis);
 void delayMillis(int millis, bool ignore);
 
 // Move to point wrappers
+void moveThroughPoints(vector<Coordinate> points, drive_directions direction, int speed, bool slew);
+void moveThroughPoints(vector<Coordinate> points, drive_directions direction, int speed);
 void moveToPoint(Coordinate newpoint, drive_directions direction, int speed, bool slew);
 void moveToPoint(Coordinate newpoint, ez::drive_directions direction, int speed);
 

@@ -13,7 +13,8 @@ extern bool overrideDrive;
 
 inline pros::Optical colorSens(2);
 inline pros::Optical proximitySens(3);
-inline pros::Distance distanceSens(8);
+inline pros::Distance distanceSensBack(8);
+inline pros::Distance distanceSensSide(7);
 
 inline pros::Motor intakeFirst(-1);
 inline pros::Motor intakeSecond(10);

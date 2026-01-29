@@ -1,6 +1,6 @@
 #include "main.h"  // IWYU pragma: keep
 
-Stanley stanley({16.5, 0.0, 170.25}, {4.0, 0.15, 29.5, 30.0}, {3, 60}, 10.0);
+Stanley stanley({16.5, 0.0, 170.25}, {4.0, 0.15, 29.5, 30.0}, {3, 60}, 15.0);
 
 double Stanley::crosstrack(Coordinate cur, Coordinate min) {
 	// Check for edge cases

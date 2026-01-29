@@ -138,7 +138,7 @@ std::vector<Coordinate> injectPath(std::vector<Coordinate> coordList, double loo
 // Set position wrappers
 //
 
-void setPosition(double x, double y) { setPosition(x, y, currentPoint.t); }
+void setPosition(double x, double y) { setPosition(x, y, autonMode != BRAIN ? chassis.odom_theta_get() : currentPoint.t); }
 
 void setPosition(double x, double y, double t) {
 	if(autonMode != BRAIN) {
@@ -151,7 +151,9 @@ void setPosition(double x, double y, double t) {
 	autonPath.push_back(currentPoint);
 }
 
-double getDistanceActual() { return (distanceSens.get() / 25.4) + 7.5; }
+double getDistanceActualBack() { return (distanceSensBack.get() / 25.4) + 7.5; }
+
+double getDistanceActualSide() { return (distanceSensSide.get() / 25.4) + 5.657; }
 
 //
 // Wait wrappers
@@ -244,15 +246,14 @@ void delayMillis(int millis) { delayMillis(millis, false); }
 // Move to point wrappers
 //
 
-void moveThroughPoints(vector<Coordinate> points, drive_directions direction, int speed) {
-	bool slew_state = false;
+void moveThroughPoints(vector<Coordinate> points, drive_directions direction, int speed, bool slew) {
 	vector<odom> points_ez = {};
 	switch(autonMode) {
 		case PLAIN:
 			for(auto point : points) {
 				turnSet(getTheta({chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()}, point, direction), speed);
 				&point != &points.back() ? pidWait(CHAIN) : pidWait(WAIT);
-				driveSet((getDistance({chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()}, point) * (direction == rev ? -1 : 1)), speed);
+				driveSet((getDistance({chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()}, point) * (direction == rev ? -1 : 1)), speed, slew);
 				if(&point != &points.back()) pidWait(CHAIN);
 			}
 			break;
@@ -264,10 +265,10 @@ void moveThroughPoints(vector<Coordinate> points, drive_directions direction, in
 			currentPoint.right = speed * (direction == fwd ? 1 : -1);
 			autonPath.push_back(currentPoint);
 			for(auto point : points) {
-				odom point_ez = {{point.x, point.y, point.t}, direction, speed};
+				odom point_ez = {{point.x, point.y}, direction, speed};
 				points_ez.push_back(point_ez);
 			}
-			chassis.pid_odom_set(points_ez);
+			chassis.pid_odom_set(points_ez, slew);
 			break;
 		case STANLEY:
 			currentPoint.t = getTheta({currentPoint.x, currentPoint.y}, points[0], direction);
@@ -276,16 +277,22 @@ void moveThroughPoints(vector<Coordinate> points, drive_directions direction, in
 			currentPoint.left = speed * (direction == fwd ? 1 : -1);
 			currentPoint.right = speed * (direction == fwd ? 1 : -1);
 			autonPath.push_back(currentPoint);
-			stanley.drive_set_path(injectPath(points, .5), direction, speed, getDistance(currentPoint, points.back()) > 18 ? true : false);
+			stanley.drive_set_path(injectPath(points, .5), direction, speed, slew);
 			break;
 		default:
 			for(auto point : points) {
 				turnSet(getTheta(currentPoint, point, direction), speed);
 				pidWait(WAIT);
-				driveSet((getDistance(currentPoint, point) * (direction == rev ? -1 : 1)), speed);
+				driveSet((getDistance(currentPoint, point) * (direction == rev ? -1 : 1)), speed, slew);
 			}
 			break;
 	}
+}
+
+void moveThroughPoints(vector<Coordinate> points, drive_directions direction, int speed) {
+	bool slew_state = false;
+	if(getDistance(currentPoint, points[0]) > 48) slew_state = true;
+	moveThroughPoints(points, direction, speed, slew_state);
 }
 
 void moveToPoint(Coordinate newpoint, drive_directions direction, int speed, bool slew) {
@@ -293,7 +300,7 @@ void moveToPoint(Coordinate newpoint, drive_directions direction, int speed, boo
 		case PLAIN:
 			turnSet(getTheta({chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()}, newpoint, direction), speed);
 			pidWait(WAIT);
-			driveSet((getDistance({chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()}, newpoint) * (direction == rev ? -1 : 1)), speed);
+			driveSet((getDistance({chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()}, newpoint) * (direction == rev ? -1 : 1)), speed, slew);
 			break;
 		case ODOM:
 			currentPoint.t = getTheta({currentPoint.x, currentPoint.y}, newpoint, direction);
@@ -316,7 +323,7 @@ void moveToPoint(Coordinate newpoint, drive_directions direction, int speed, boo
 		default:
 			turnSet(getTheta(currentPoint, newpoint, direction), speed);
 			pidWait(WAIT);
-			driveSet((getDistance(currentPoint, newpoint) * (direction == rev ? -1 : 1)), speed);
+			driveSet((getDistance(currentPoint, newpoint) * (direction == rev ? -1 : 1)), speed, slew);
 			break;
 	}
 }
