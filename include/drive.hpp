@@ -45,6 +45,7 @@ void setPosition(double x, double y);
 void setPosition(double x, double y, double t);
 double getDistanceActualBack();
 double getDistanceActualSide();
+double getDistanceActual(double hyp, double theta);
 
 // Wait wrappers
 void pidWait(Wait type);

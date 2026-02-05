@@ -74,6 +74,7 @@ extern Jammable intakeBack;
 
 bool shift();
 
+void setIntake(int front, int back, bool indexer_on);
 void setIntake(int speed, bool indexer_on);
 void setIntake(int front, int back);
 void setIntake(int speed);

@@ -4,16 +4,16 @@
 // Wrappers & Utility functions
 //
 
+void setIntake(int front, int back, bool indexer_on) {
+	if(autonMode != BRAIN) {
+		indexer.set(indexer_on);
+		setIntake(front, back);
+	}
+}
+
 void setIntake(int speed, bool indexer_on) {
 	if(autonMode != BRAIN) {
-		bool use_delay = false;
-		if(!indexer_on && indexer.get()) use_delay = true;
-
 		indexer.set(indexer_on);
-		if(use_delay) {
-			setIntake(0);
-			pros::delay(250);
-		}
 		setIntake(speed);
 	}
 }

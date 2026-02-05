@@ -155,6 +155,8 @@ double getDistanceActualBack() { return (distanceSensBack.get() / 25.4) + 7.5; }
 
 double getDistanceActualSide() { return (distanceSensSide.get() / 25.4) + 5.657; }
 
+double getDistanceActual(double hyp, double theta) { return hyp * cos(theta * M_PI / 180); }
+
 //
 // Wait wrappers
 //

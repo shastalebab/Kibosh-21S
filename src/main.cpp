@@ -28,14 +28,14 @@ void initialize() {
 	auton_sel.selector_populate({{right_split, "right_split", "right side 3 + 6", gray},
 								 {left_split, "left_split", "left side 3 + 6", lv_color_lighten(gray, 125)},
 								 {right_awp, "right_awp", "right side 4 + 6 + 3 solo AWP", violet},
-								 // {right_greed, "right_greed", "right side 9 in long goal", lv_color_darken(green, 60)},
-								 // {left_greed, "left_greed", "left side 9 in long goal", green},
+								 {right_elims, "right_elims", "right side 6 + 3", lv_color_darken(green, 60)},
+								 {left_elims, "left_elims", "left side 6 + 3", green},
 								 // {right_rush, "right_rush", "right side 7 in long goal", lv_color_darken(red, 60)},
 								 // {left_rush, "left_rush", "left side 7 in long goal", lv_color_darken(red, 30)},
 								 // {right_superrush, "right_rush", "right side 4 in long goal", lv_color_lighten(red, 30)},
 								 // {left_superrush, "left_superrush", "left side 4 in long goal", lv_color_lighten(red, 60)},
 								 {skills, "skills", "skills route", lv_color_darken(blue, 60)},
-								 {vexu_scrim, "vexu_scrim", "vexu scrim sawp", blue},
+								 // {vexu_scrim, "vexu_scrim", "vexu scrim sawp", blue},
 								 // {skills_awp, "skills_awp", "awp route but for skills", lv_color_lighten(blue, 60)},
 								 {constants_test, "constants_test", "drive and turn", blue}});
 
@@ -55,6 +55,7 @@ void initialize() {
 	pros::Task AngleCheckTask(angleCheckTask, "angle checker");
 	pros::Task MotorUpdateTask(motorUpdateTask, "motor info updater");
 	master.rumble(chassis.drive_imu_calibrated() && !drifting ? "." : "---");
+	descore.set(false);
 }
 
 void disabled() {}
@@ -77,6 +78,7 @@ void autonomous() {
 
 void opcontrol() {
 	chassis.drive_brake_set(pros::E_MOTOR_BRAKE_BRAKE);
+	chassis.drive_sensor_reset();
 	autonMode = PLAIN;	// Sets "mode" to "PLAIN", to ensure that any drive macros
 						// in opcontrol only use PID
 
