@@ -13,6 +13,7 @@ class Stanley {
 	double xy_delta_fake;
 	double xy_last_fake;
 	bool was_stanley_just_set;
+	Coordinate init;
 	int sgn_init;
    public:
 	vector<Coordinate> stanleyPoints = {};

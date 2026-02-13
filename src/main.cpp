@@ -17,7 +17,7 @@ void initialize() {
 
 	// Configure chassis controls
 	chassis.opcontrol_curve_buttons_toggle(false);	// Enables modifying the controller curve with controller buttons
-	chassis.opcontrol_drive_activebrake_set(2.0);	// Sets the active brake kP
+	chassis.opcontrol_drive_activebrake_set(0.0);	// Sets the active brake kP
 	chassis.opcontrol_curve_default_set(0.0,
 										0.0);  // Set defaults for controller curve
 
@@ -25,19 +25,18 @@ void initialize() {
 	default_constants();
 
 	// Add autons to auton selector
-	auton_sel.selector_populate({{right_split, "right_split", "right side 3 + 6", gray},
-								 {left_split, "left_split", "left side 3 + 6", lv_color_lighten(gray, 125)},
+	auton_sel.selector_populate({// {right_split, "right_split", "right side 3 + 6", gray},
+								 // {left_split, "left_split", "left side 3 + 6", lv_color_lighten(gray, 125)},
 								 {right_awp, "right_awp", "right side 4 + 6 + 3 solo AWP", violet},
-								 {right_elims, "right_elims", "right side 6 + 3", lv_color_darken(green, 60)},
-								 {left_elims, "left_elims", "left side 6 + 3", green},
-								 // {right_rush, "right_rush", "right side 7 in long goal", lv_color_darken(red, 60)},
-								 // {left_rush, "left_rush", "left side 7 in long goal", lv_color_darken(red, 30)},
+								 {right_split, "right_split", "right side 6 + 3", lv_color_darken(green, 60)},
+								 {left_split, "left_split", "left side 6 + 3", green},
+								 // {right_rush, "right_rush", "right side 6 in long goal", lv_color_darken(blue, 60)},
+								 // {left_rush, "left_rush", "left side 6 in long goal", lv_color_lighten(blue, 30)},
 								 // {right_superrush, "right_rush", "right side 4 in long goal", lv_color_lighten(red, 30)},
 								 // {left_superrush, "left_superrush", "left side 4 in long goal", lv_color_lighten(red, 60)},
-								 {skills, "skills", "skills route", lv_color_darken(blue, 60)},
-								 // {vexu_scrim, "vexu_scrim", "vexu scrim sawp", blue},
-								 // {skills_awp, "skills_awp", "awp route but for skills", lv_color_lighten(blue, 60)},
-								 {constants_test, "constants_test", "drive and turn", blue}});
+								 {skills, "skills", "skills route", lv_color_darken(pink, 60)},
+								 {vexu_scrim, "vexu_scrim", "vexu scrim sawp", blue},
+								 {constants_test, "constants_test", "drive and turn", pink}});
 
 	// Initialize chassis
 	chassis.initialize();
@@ -91,11 +90,11 @@ void opcontrol() {
 		setAlignerOp();	  // Aligner controls
 		setWingOp();	  // Wing controls
 		setDescoreOp();	  // Hook controls
-		setStraightOp();
+		// setStraightOp();
 
-		setIntakeTeam();	// Team intake overrides
-		setDescoreTeam();	// Team descore overrides
-		setStraightTeam();	// Team driving overrides
+		// setIntakeTeam();	// Team intake overrides
+		// setDescoreTeam();	// Team descore overrides
+		// setStraightTeam();	// Team driving overrides
 
 		pros::delay(ez::util::DELAY_TIME);
 	}

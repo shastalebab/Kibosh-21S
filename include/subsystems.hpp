@@ -3,6 +3,7 @@
 #include "EZ-Template/api.hpp"
 #include "api.h"
 #include "pros/distance.hpp"
+#include "pros/motor_group.hpp"
 #include "pros/motors.hpp"
 
 extern Drive chassis;
@@ -54,7 +55,7 @@ class Jammable {
 		pause = false;
 		lock = false;
 	}
-	Jammable(vector <pros::Motor*> Motors, int Limit, int Attempts, int DelayTime, float MaxTemp, bool Pause) {
+	Jammable(vector<pros::Motor*> Motors, int Limit, int Attempts, int DelayTime, float MaxTemp, bool Pause) {
 		motors = Motors;
 		attempts = Attempts;
 		limit = Limit;
@@ -66,7 +67,7 @@ class Jammable {
 };
 
 enum Colors { BLUE = 0, NEUTRAL = 1, RED = 2 };
-enum Sorting {UNPRIMED = 0, PRIMED = 1, DELAYED = 2};
+enum Sorting { UNPRIMED = 0, PRIMED = 1, DELAYED = 2 };
 
 extern Colors allianceColor;
 extern Jammable intakeFront;

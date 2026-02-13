@@ -86,14 +86,16 @@ void masterControllerTask() {
 			// Update timer and rumble controller
 			if(!pros::competition::is_autonomous() && !pros::competition::is_disabled()) {
 				if(pattern == "") {
-					if(timer == 475)
-						pattern = "";  // "- -"
-					else if(timer >= 500 && timer < 525)
-						pattern = "";  // "."
-					else
+					if(timer == 425 && timer % 5 == 0)
+						pattern = ""; // ".- .-";
+					else if(timer == 475 && timer % 5 == 0)
+						pattern = ""; //"- -";
+					else if(timer >= 500 && timer < 525 && timer % 5 == 0)
+						pattern = ""; //".";
+					else if(controllerInput != "")
 						pattern = controllerInput;
 				}
-				if(controllerInput != "") {
+				if(pattern != "") {
 					master.rumble(pattern.c_str());
 					controllerInput = "";
 					pattern = "";

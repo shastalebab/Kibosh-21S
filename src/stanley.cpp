@@ -4,7 +4,7 @@ Stanley stanley({16.5, 0.0, 170.25}, {4.0, 0.15, 29.5, 30.0}, {3, 60}, 15.0);
 
 double Stanley::crosstrack(Coordinate cur, Coordinate min) {
 	// Check for edge cases
-	if(fmod(min.t, 180) == 0) {
+	if(fmod(min.t, 180.0) == 0) {
 		// Case where cot(a) is undefined
 		return getDistance({cur.x, min.y}, cur);
 	} else if(fmod(min.t, 90) == 0) {
@@ -13,7 +13,7 @@ double Stanley::crosstrack(Coordinate cur, Coordinate min) {
 	}
 
 	// Calculate intersection between tangent line of min passing through min and normal line of min passing through cur
-	double a = min.t * M_PI / 180;
+	double a = min.t * M_PI / 180.0;
 	double det = -(tan(a)) - (cos(a) / sin(a));
 	double new_x = -(-(min.y - (tan(a) * min.x)) + (cur.y + ((cos(a) / sin(a)) * cur.x))) / det;
 	double new_y = -((tan(a) * (cur.y + ((cos(a) / sin(a)) * cur.x))) + ((cos(a) / sin(a)) * (min.y - (tan(a) * min.x)))) / det;
@@ -24,16 +24,10 @@ double Stanley::crosstrack(Coordinate cur, Coordinate min) {
 }
 
 double Stanley::xy_error(Coordinate cur, Coordinate target) {
-	// Translated current x, y translated around origin
-	double fakek_y = (cur.y - target.y);
-	double fakek_x = (cur.x - target.x);
-
-	// Rotate around origin
-	double fake_angle = target.t * M_PI / 180;
-	double fake_x = (fakek_x * cos(fake_angle)) - (fakek_y * sin(fake_angle));
-	double fake_y = (fakek_y * cos(fake_angle)) + (fakek_x * sin(fake_angle));
-
-	return fake_y;
+	double theta_init = getTheta(init, target, fwd);
+	double theta_cur = getTheta(cur, target, fwd);
+	int flipped = (theta_cur >= theta_init + 90) || (theta_cur <= theta_init - 90) ? -1 : 1;
+	return getDistance(cur, target) * flipped;
 }
 
 pair<double, double> Stanley::compute() {
@@ -58,7 +52,7 @@ pair<double, double> Stanley::compute() {
 	double velocity = (fabs(chassis.drive_velocity_left()) + fabs(chassis.drive_velocity_right())) / 2;
 
 	// Calculate heading output and set PID targets
-	double output_t = delta_t + ((atan2(ct_error * this->ke, velocity)) * (180 / M_PI));
+	double output_t = delta_t + ((atan2(ct_error * this->ke, velocity)) * (180.0 / M_PI));
 
 	// Decide if we've past the target or not
 	double temp_target = xy_error(cur, this->stanleyPoints.back());		   // Use this instead of distance formula to fix impossible movements
@@ -74,7 +68,7 @@ pair<double, double> Stanley::compute() {
 	xy_last_fake = xy_current_fake;
 
 	new_current_fake += xy_delta_fake * ((dir * flipped));	// Create a "current sensor value" for the PID to calculate off of
-	
+
 	this->stanleyDrivePID.compute_error(fabs(temp_target) * dir * flipped, new_current_fake);
 	this->stanleyTurnPID.target_set(output_t);
 	this->slewLeft.iterate(chassis.drive_sensor_left());
@@ -84,10 +78,10 @@ pair<double, double> Stanley::compute() {
 	double l_out = this->stanleyTurnPID.compute(chassis.odom_theta_get()) + this->stanleyDrivePID.output;
 
 	// Setup ackermann turning radius and wheel velocities to calculate right output
-	double radius = 4.75 / tan(output_t * (M_PI / 180));
+	double radius = 4.75 / tan(output_t * (M_PI / 180.0));
 	double v_left = getVelocity(l_out);
 	double v_right = ((2 * radius * v_left) + (ROBOT_WIDTH * v_left)) / ((2 * radius) - ROBOT_WIDTH);
-	if(tan(output_t * (M_PI / 180)) == 0) v_right = v_left;
+	if(tan(output_t * (M_PI / 180.0)) == 0) v_right = v_left;
 
 	// Convert right velocity into voltage
 	double r_out = (15240 * v_right) / (2 * M_PI * WHEEL_DIAMETER * chassis.drive_rpm_get());
@@ -114,6 +108,7 @@ void Stanley::drive_set_path(vector<Coordinate> points, drive_directions dir, in
 	points[0].t = util::wrap_angle(points[0].t);
 	if(cur.t < 0) cur.t += 360;
 	if(points[0].t < 0) points[0].t += 360;
+	init = cur;
 
 	// Identify crosstrack error, heading error, and velocity
 	double ct_error = crosstrack(cur, points[0]);
@@ -121,7 +116,7 @@ void Stanley::drive_set_path(vector<Coordinate> points, drive_directions dir, in
 	double velocity = (fabs(chassis.drive_velocity_left()) + fabs(chassis.drive_velocity_right())) / 2;
 
 	// Calculate heading output and set PID targets
-	double output_t = delta_t + ((atan2(ct_error * this->ke, velocity)) * M_PI / 180);
+	double output_t = delta_t + ((atan2(ct_error * this->ke, velocity)) * M_PI / 180.0);
 
 	this->stanleyTurnPID.target_set(output_t);
 	this->stanleyDrivePID.target_set(getDistance(cur, this->stanleyPoints.back()));
@@ -147,6 +142,7 @@ void Stanley::drive_set_point(Coordinate point, drive_directions dir, int speed,
 	point.t = util::wrap_angle(point.t);
 	if(cur.t < 0) cur.t += 360;
 	if(point.t < 0) point.t += 360;
+	init = cur;
 
 	// Identify crosstrack error, heading error, and velocity
 	double ct_error = crosstrack(cur, point);
@@ -154,7 +150,7 @@ void Stanley::drive_set_point(Coordinate point, drive_directions dir, int speed,
 	double velocity = (fabs(chassis.drive_velocity_left()) + fabs(chassis.drive_velocity_right())) / 2;
 
 	// Calculate heading output and set PID targets
-	double output_t = delta_t + ((atan2(ct_error * this->ke, velocity)) * M_PI / 180);
+	double output_t = delta_t + ((atan2(ct_error * this->ke, velocity)) * M_PI / 180.0);
 
 	this->stanleyTurnPID.target_set(output_t);
 	this->stanleyDrivePID.target_set(getDistance(cur, this->stanleyPoints.back()));
@@ -184,6 +180,7 @@ void Stanley::drive_set(double distance, int speed, bool slew) {
 	point.t = util::wrap_angle(point.t);
 	if(cur.t < 0) cur.t += 360;
 	if(point.t < 0) point.t += 360;
+	init = cur;
 
 	// Identify crosstrack error, heading error, and velocity
 	double ct_error = crosstrack(cur, point);
@@ -191,7 +188,7 @@ void Stanley::drive_set(double distance, int speed, bool slew) {
 	double velocity = (fabs(chassis.drive_velocity_left()) + fabs(chassis.drive_velocity_right())) / 2;
 
 	// Calculate heading output and set PID targets
-	double output_t = delta_t + ((atan2(ct_error * this->ke, velocity)) * M_PI / 180);
+	double output_t = delta_t + ((atan2(ct_error * this->ke, velocity)) * M_PI / 180.0);
 
 	this->stanleyTurnPID.target_set(output_t);
 	this->stanleyDrivePID.target_set(getDistance(cur, this->stanleyPoints.back()));
@@ -261,7 +258,7 @@ void Stanley::drive_wait() {
 }
 
 void stanleyTask() {
-	stanley.stanleyDrivePID.exit_condition_set(70, 1.7, 180, 4, 200, 200);
+	stanley.stanleyDrivePID.exit_condition_set(70, 1.7, 180.0, 4, 200, 200);
 	stanley.stanleyTurnPID.exit_condition_set(50, 3, 170, 9, 150, 150);
 
 	while(true) {

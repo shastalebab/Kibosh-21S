@@ -107,7 +107,13 @@ void pathViewerTask() {
 	while(true) {
 		if(pathIter < pathDisplay.size() && pathDisplay.size() > 1 && playing) {
 			lv_obj_clear_flag(autonRobot, LV_OBJ_FLAG_HIDDEN);
-			lv_obj_set_pos(autonRobot, (2 * pathDisplay[pathIter].x) - 11, 130 - (2 * pathDisplay[pathIter].y));
+			double x = (pathDisplay[pathIter].x + 72) * 2;
+			double y = (pathDisplay[pathIter].y) * 2;
+			if(x < 0) x += 288;
+			if(x > 288) x -= 288;
+			if(y < 0) y += 144;
+			if(y > 144) y -= 144;
+			lv_obj_set_pos(autonRobot, x - 11, 130 - y);
 			if(pathIter < pathDisplay.size() - 1) {
 				lv_img_set_angle(autonRobot, 10 * (pathDisplay[pathIter].t));
 				if(pathDisplay[pathIter].left == KEY)
@@ -154,7 +160,7 @@ MotorTab turnTabObj =
 	MotorTab("turn PID", theme_color, &chassis.turnPID.error, 90, chassisMotors, turn_test, true, PidTunerValues(0.25, 0.05, 0.25, &chassis.turnPID), turnTab);
 MotorTab swingTabObj = MotorTab("swing PID", theme_color, &chassis.swingPID.error, 45, chassisMotors, swing_test, true,
 								PidTunerValues(0.25, 0.05, 0.25, &chassis.fwd_rev_swingPID), swingTab);
-MotorTab headingTabObj = MotorTab("heading PID", theme_color, &chassis.turnPID.error, 180, chassisMotors, heading_test, true,
+MotorTab headingTabObj = MotorTab("heading PID", theme_color, &chassis.headingPID.error, 180, chassisMotors, heading_test, true,
 								  PidTunerValues(0.25, 0.05, 0.25, &chassis.headingPID), headingTab);
 MotorTab odomTabObj = MotorTab("odom PID", theme_color, &chassis.xyPID.error, 135, chassisMotors, odom_test, true,
 							   PidTunerValues(0.25, 0.05, 0.25, &chassis.fwd_rev_drivePID), odomTab);
@@ -686,8 +692,8 @@ void pidTunerInit() {
 	driveTabObj.addTab();
 	turnTabObj.addTab();
 	swingTabObj.addTab();
-	//headingTabObj.addTab();
-	odomTabObj.addTab();
+	headingTabObj.addTab();
+	//odomTabObj.addTab();
 
 	// Modify styles
 	lv_obj_set_style_text_font(tabs, &pros_font_dejavu_mono_18, LV_PART_ITEMS);

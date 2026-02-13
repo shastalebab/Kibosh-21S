@@ -17,10 +17,10 @@ double getDistance(Coordinate point1, Coordinate point2) {
 }
 
 double getTheta(Coordinate point1, Coordinate point2, drive_directions direction) {
-	auto new_direction = direction == rev ? 180 : 0;
+	auto new_direction = direction == rev ? 180.0 : 0;
 	double errorX = point2.x - point1.x;
 	double errorY = point2.y - point1.y;
-	double theta = (atan2(errorX, errorY) * 180 / M_PI) + new_direction;
+	double theta = (atan2(errorX, errorY) * 180.0 / M_PI) + new_direction;
 	theta = fmod(theta, 360);
 	if(theta < 0) theta += 360;
 	return theta;
@@ -32,8 +32,8 @@ double getTimeToPoint(double distance, double velocity) { return distance / velo
 
 Coordinate getPoint(Coordinate startPoint, double distance) {
 	// Get the x and y error between the new point and the current point
-	double errorX = distance * (sin(startPoint.t * M_PI / 180));
-	double errorY = distance * (cos(startPoint.t * M_PI / 180));
+	double errorX = distance * (sin(startPoint.t * M_PI / 180.0));
+	double errorY = distance * (cos(startPoint.t * M_PI / 180.0));
 
 	// Add the error to the start point to create the end point
 	Coordinate endPoint = startPoint;
@@ -46,12 +46,12 @@ Coordinate getPoint(Coordinate startPoint, double distance) {
 Coordinate getPoint(Coordinate startPoint, double v_left, double v_right, double time) {
 	// Get the coordinate within the reference frame of the robot of the end point
 	double radius = (v_right + v_left) / (v_right - v_left) * (ROBOT_WIDTH / 2);
-	double theta = ((v_right - v_left) / ROBOT_WIDTH * time) + (startPoint.t * M_PI / 180);
+	double theta = ((v_right - v_left) / ROBOT_WIDTH * time) + (startPoint.t * M_PI / 180.0);
 
-	double relative_x = -((-radius * cos(theta) + radius) - (-radius * cos(startPoint.t * M_PI / 180) + radius));
-	double relative_y = -((radius * sin(theta)) - (radius * sin(startPoint.t * M_PI / 180)));
+	double relative_x = -((-radius * cos(theta) + radius) - (-radius * cos(startPoint.t * M_PI / 180.0) + radius));
+	double relative_y = -((radius * sin(theta)) - (radius * sin(startPoint.t * M_PI / 180.0)));
 
-	theta *= 180 / M_PI;
+	theta *= 180.0 / M_PI;
 	theta = fmod(theta, 360);
 	if(theta < 0) theta += 360;
 
@@ -92,8 +92,8 @@ std::vector<Coordinate> injectPoint(Coordinate startPoint, Coordinate endPoint, 
 			else if(((left > right && behavior == cw) || (right > left && behavior == ccw)))
 				time *= -1;
 			// Inject points along curve
-			while(!(newPoint.t > theta - abs((v_right - v_left) / ROBOT_WIDTH * time * 180 / M_PI) &&
-					newPoint.t < theta + abs((v_right - v_left) / ROBOT_WIDTH * time * 180 / M_PI))) {
+			while(!(newPoint.t > theta - abs((v_right - v_left) / ROBOT_WIDTH * time * 180.0 / M_PI) &&
+					newPoint.t < theta + abs((v_right - v_left) / ROBOT_WIDTH * time * 180.0 / M_PI))) {
 				newPoint = getPoint(startPoint, v_left, v_right, iter);
 				newPoint.left = left;
 				newPoint.right = right;
@@ -155,7 +155,7 @@ double getDistanceActualBack() { return (distanceSensBack.get() / 25.4) + 7.5; }
 
 double getDistanceActualSide() { return (distanceSensSide.get() / 25.4) + 5.657; }
 
-double getDistanceActual(double hyp, double theta) { return hyp * cos(theta * M_PI / 180); }
+double getDistanceActual(double hyp, double theta) { return hyp * cos(theta * M_PI / 180.0); }
 
 //
 // Wait wrappers
@@ -550,7 +550,7 @@ void swingSet(e_swing side, double theta, double main, double opp, e_angle_behav
 	fmod(new_t, 360);
 	if(new_t < 0) new_t += 360;
 	double radius = (v_right + v_left) / (v_right - v_left) * (ROBOT_WIDTH / 2);
-	double arcLength = radius * new_t * M_PI / 180;
+	double arcLength = radius * new_t * M_PI / 180.0;
 
 	currentPoint = getPoint(currentPoint, v_left, v_right, getTimeToPoint(arcLength, v_all));
 
