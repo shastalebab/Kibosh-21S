@@ -23,23 +23,17 @@ void constants_test();
 // RIGHT AUTONS
 //
 
-void right_elims();
 void right_split();
-void right_greed();
-void right_rush();
-void right_superrush();
+void right_spread();
+void right_co_awp();
 void right_awp();
 
 //
 // LEFT AUTONS
 //
 
-void left_elims();
 void left_split();
-void left_greed();
 void left_rush();
-void left_superrush();
-void left_awp();
 
 //
 // SKILLS

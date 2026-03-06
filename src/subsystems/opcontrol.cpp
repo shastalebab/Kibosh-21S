@@ -10,7 +10,6 @@ bool interruptDescore = false;
 bool interruptDrive = false;
 bool overrideDrive = false;
 double imu_cur = 0;
-int masterTarget = 0;
 
 bool shift() { return master.get_digital(pros::E_CONTROLLER_DIGITAL_R2); }
 
@@ -19,18 +18,23 @@ void setIntakeOp() {
 
 	if(interruptintake) return;
 
-	if(SKILLS && redirect.get() && master.get_digital(pros::E_CONTROLLER_DIGITAL_L1) && shift()) {	// mid goal scoring for skills
-		setIntake(67, false);
-	} else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {	// storing/scoring
-		setIntake(127, !shift());
+	int intake_speed = 127;
+	int outtake_speed = -127;
+
+	// Middle goal scoring speed
+	if(redirect.get() && shift()) intake_speed = SKILLS ? 40 : 90;
+
+	// Low goal scoring speed
+	if(!shift() && aligner.get()) outtake_speed = SKILLS ? -60 : -90;
+
+	if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {	// storing/scoring
+		setIntake(intake_speed, !shift());
 	} else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {	// low goal slow/fast
-		setIntake(shift() ? -127 : -90, shift());
+		setIntake(outtake_speed, false);
 	} else {  // at rest
 		setIntake(0);
-		intakeFront.lock = false;
-		intakeBack.lock = false;
+		intake.lock = false;
 	}
-	masterTarget = (util::sgn(intakeFront.target));
 }
 
 void setRedirectOp() {
@@ -41,8 +45,6 @@ void setRedirectOp() {
 		}
 		if(aligner.get() && !SKILLS)
 			aligner.set(false);
-		else if(SKILLS && !redirect.get())
-			aligner.set(true);
 		redirect.set(!redirect.get());
 	}
 }
@@ -112,7 +114,7 @@ void setIntakeTeam() {
 	if(team.get_digital(pros::E_CONTROLLER_DIGITAL_L1) &&
 	   (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1) || master.get_digital(pros::E_CONTROLLER_DIGITAL_L2))) {
 		interruptintake = true;
-		setIntake(-127 * masterTarget);
+		setIntake(-127 * intake.target);
 		if(team.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L1)) sendHaptic(".-");
 	} else
 		interruptintake = false;

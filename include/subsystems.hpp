@@ -14,8 +14,9 @@ extern bool overrideDrive;
 
 inline pros::Optical colorSens(2);
 inline pros::Optical proximitySens(3);
-inline pros::Distance distanceSensBack(8);
-inline pros::Distance distanceSensSide(7);
+inline pros::Distance distanceSensBack(21);
+inline pros::Distance distanceSensLeft(7);
+inline pros::Distance distanceSensRight(6);
 
 inline pros::Motor intakeFirst(-1);
 inline pros::Motor intakeSecond(10);
@@ -44,6 +45,7 @@ class Jammable {
 
 	bool lock;
 	void checkJam();
+	void move(int speed);
 
 	Jammable() {
 		motors = {};
@@ -69,15 +71,13 @@ class Jammable {
 enum Colors { BLUE = 0, NEUTRAL = 1, RED = 2 };
 enum Sorting { UNPRIMED = 0, PRIMED = 1, DELAYED = 2 };
 
+extern bool SKILLS;
 extern Colors allianceColor;
-extern Jammable intakeFront;
-extern Jammable intakeBack;
+extern Jammable intake;
 
 bool shift();
 
-void setIntake(int front, int back, bool indexer_on);
 void setIntake(int speed, bool indexer_on);
-void setIntake(int front, int back);
 void setIntake(int speed);
 
 void setRedirect(bool state);

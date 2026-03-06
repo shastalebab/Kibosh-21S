@@ -66,13 +66,13 @@ void angleCheckTask() {
 		if(aligning) {
 			double target = autonPath.size() > 0 ? autonPath[0].t : 0;
 			double current = fmod(chassis.odom_theta_get(), 360);
-			pair<double, double> travel = {chassis.drive_sensor_left(), chassis.drive_sensor_right()};
+			pair<double, double> travel = {getDistanceActual(LEFT, true, 20), getDistanceActual(RIGHT, true, 20)};
 			pair<double, double> coordinate = {chassis.odom_x_get(), chassis.odom_y_get()};
 			target = util::wrap_angle(target);
 			current = util::wrap_angle(current);
 			lv_label_set_text(angleText,
 							  (util::to_string_with_precision(current, 2) + " °" + ", target: " + util::to_string_with_precision(target, 2) +
-							   "\nleft: " + util::to_string_with_precision(travel.first, 2) + ", right: " + util::to_string_with_precision(travel.second, 2) +
+							   "\nleft: " + util::to_string_with_precision(travel.first, 2) + ", right: " + util::to_string_with_precision(travel.second, 2) + ", back: " + util::to_string_with_precision(getDistanceActual(BACK, true, 20)) +
 							   "\nx: " + util::to_string_with_precision(coordinate.first, 2) + ", y: " + util::to_string_with_precision(coordinate.second, 2))
 								  .c_str());
 			if(drifting)
@@ -328,6 +328,7 @@ static void selectAuton(lv_event_t* e) {
 	auton_sel.selector_callback = (*getAuton).callback;
 	auton_sel.selector_name = (*getAuton).name;
 	resetViewer(true);
+	pros::c::controller_print(pros::E_CONTROLLER_MASTER, 2, 0, (auton_sel.selector_name + "        ").c_str());
 }
 
 static void autonUpEvent(lv_event_t* e) { lv_obj_scroll_by_bounded(autonTable, 0, lv_obj_get_height(autonTable), LV_ANIM_ON); }

@@ -8,7 +8,7 @@ ez::Drive chassis(
 	{-12, 16, -17},	 // Left Chassis Ports (negative port will reverse it!)
 	{11, -20, 19},	 // Right Chassis Ports (negative port will reverse it!)
 
-	21,				 // IMU Port
+	8,				 // IMU Port
 	WHEEL_DIAMETER,	 // Wheel Diameter
 	400);			 // Wheel RPM
 
@@ -25,17 +25,14 @@ void initialize() {
 	default_constants();
 
 	// Add autons to auton selector
-	auton_sel.selector_populate({// {right_split, "right_split", "right side 3 + 6", gray},
-								 // {left_split, "left_split", "left side 3 + 6", lv_color_lighten(gray, 125)},
-								 {right_awp, "right_awp", "right side 4 + 6 + 3 solo AWP", violet},
+	auton_sel.selector_populate({{right_awp, "right_awp", "right side 5 + 6 + 3 solo AWP", violet},
 								 {right_split, "right_split", "right side 6 + 3", lv_color_darken(green, 60)},
 								 {left_split, "left_split", "left side 6 + 3", green},
-								 // {right_rush, "right_rush", "right side 6 in long goal", lv_color_darken(blue, 60)},
-								 // {left_rush, "left_rush", "left side 6 in long goal", lv_color_lighten(blue, 30)},
-								 // {right_superrush, "right_rush", "right side 4 in long goal", lv_color_lighten(red, 30)},
-								 // {left_superrush, "left_superrush", "left side 4 in long goal", lv_color_lighten(red, 60)},
+								 {left_rush, "left_rush", "left side 6 rush", lv_color_lighten(green, 60)},
+								 {right_spread, "right_spread", "right side 1 + 5 + 3", lv_color_darken(blue, 60)},
+								 {right_co_awp, "right_co_awp", "right side 4 + 3 + 5", lv_color_lighten(blue, 60)},
 								 {skills, "skills", "skills route", lv_color_darken(pink, 60)},
-								 {vexu_scrim, "vexu_scrim", "vexu scrim sawp", blue},
+								 // {vexu_scrim, "vexu_scrim", "vexu scrim sawp", blue},
 								 {constants_test, "constants_test", "drive and turn", pink}});
 
 	// Initialize chassis
@@ -75,6 +72,17 @@ void autonomous() {
 	auton_sel.selector_callback();	// Calls selected auton from autonomous selector
 }
 
+void skills_abort() {
+	while(true) {
+		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
+			autonMode = BRAIN;
+			chassis.pid_targets_reset();
+			return;
+		}
+		pros::delay(10);
+	}
+}
+
 void opcontrol() {
 	chassis.drive_brake_set(pros::E_MOTOR_BRAKE_BRAKE);
 	chassis.drive_sensor_reset();
@@ -83,6 +91,23 @@ void opcontrol() {
 
 	while(true) {
 		if(!probing && !overrideDrive) chassis.opcontrol_tank();  // Tank control
+
+		if(SKILLS && master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
+			chassis.pid_targets_reset();   // Resets PID targets to 0
+			chassis.drive_imu_reset();	   // Reset gyro position to 0
+			chassis.drive_sensor_reset();  // Reset drive sensors to 0
+			chassis.odom_xyt_set(0_in, 0_in,
+								 0_deg);				// Reset current position to a default pose
+			chassis.drive_brake_set(MOTOR_BRAKE_HOLD);	// Set motors to hold.  This helps
+														// autonomous consistency
+
+			autonMode = ODOM;  // Sets which "mode" the auton is run in
+			autonPath = {};	   // Clears saved auton path
+			pros::Task Skills_Abort(skills_abort, "driver skills abort");
+			skills();
+			autonMode = PLAIN;
+			pidWait(WAIT);
+		}
 
 		setIntakeOp();	  // Intake controls
 		setRedirectOp();  // Redirect controls

@@ -62,12 +62,12 @@ void colorTask() {
 		colorSet(color, colorInd);
 		if(!pros::competition::is_disabled() && colorCompare(color)) {
 			if(primed == PRIMED) {
-					setIntake(intakeFront.target, 0);
+					setIntake(intake.target);
 					primed = UNPRIMED;
                     pros::delay(250);
 			} else if(primed == DELAYED) {
 					delayMillis(400);
-					setIntake(intakeFront.target, 0);
+					setIntake(intake.target);
 					primed = UNPRIMED;
                     pros::delay(250);
 			}

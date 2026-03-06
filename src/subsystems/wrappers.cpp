@@ -4,31 +4,22 @@
 // Wrappers & Utility functions
 //
 
-void setIntake(int front, int back, bool indexer_on) {
-	if(autonMode != BRAIN) {
-		indexer.set(indexer_on);
-		setIntake(front, back);
-	}
-}
-
 void setIntake(int speed, bool indexer_on) {
 	if(autonMode != BRAIN) {
+		bool init_check = indexer.get();
 		indexer.set(indexer_on);
-		setIntake(speed);
+		if(!indexer.get() && init_check) {
+			setIntake(-127);
+			pros::delay(100);
+		}
 	}
-}
-
-void setIntake(int front, int back) {
-	if(autonMode != BRAIN) {
-		if(intakeFront.lock != true) intakeFront.motors[0]->move(front);
-		if(intakeBack.lock != true) intakeBack.motors[0]->move(back);
-		intakeFront.target = front;
-		intakeBack.target = back;
-	}
+	setIntake(speed);
 }
 
 void setIntake(int speed) {
-	setIntake(speed, speed);
+	if(autonMode != BRAIN) {
+		intake.move(speed);
+	}
 }
 
 void setRedirect(bool state) {

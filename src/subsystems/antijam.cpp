@@ -4,8 +4,16 @@
 // Anti-jam
 //
 
-Jammable intakeFront = Jammable({&intakeFirst}, 30, 10, 200, 55, false);
-Jammable intakeBack = Jammable({&intakeSecond}, 20, 5, 80, 55, false);
+Jammable intake = Jammable({&intakeFirst, &intakeSecond}, 30, 10, 200, 55, false);
+
+void Jammable::move(int speed) {
+	if(!this->lock) {
+		for(auto motor : this->motors) {
+			motor->move(speed);
+		}
+	}
+	this->target = speed;
+}
 
 void Jammable::checkJam() {
 	double currentTemp = 0.0;
@@ -13,13 +21,12 @@ void Jammable::checkJam() {
 	int it = 0;
 
 	for(auto motor : this->motors) {
-		currentTemp += motor->get_temperature();
+		if(motor->is_installed()) currentTemp += motor->get_temperature();
 		if(motor->get_actual_velocity() < currentVelocity) currentVelocity = motor->get_actual_velocity();
 		it++;
 	}
 
 	currentTemp /= it;
-	currentVelocity /= it;
 
 	if(currentTemp > this->maxTemp) return;
 
@@ -53,8 +60,7 @@ void antiJamTask() {
 		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L1) || master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L2)) {
 			pros::delay(200);
 		}
-		intakeFront.checkJam();
-        intakeBack.checkJam();
+		intake.checkJam();
 		pros::delay(10);
 	}
 }

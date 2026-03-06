@@ -7,6 +7,12 @@ const double WHEEL_DIAMETER = 3.3369184232;
 const double ROBOT_WIDTH = 11.4375;
 const int KEY = 267267;
 
+enum Distance {
+	BACK = 0,
+	RIGHT = 1,
+	LEFT = 2
+};
+
 enum AutonMode {
     STANLEY = 0,
 	ODOM = 1,
@@ -26,6 +32,7 @@ class Coordinate {
 	ez::e_angle_behavior behavior = ez::cw;
 };
 
+extern double angle_offset;
 extern AutonMode autonMode;
 extern vector<Coordinate> autonPath;
 
@@ -43,9 +50,7 @@ std::vector<Coordinate> injectPath(std::vector<Coordinate> coordList, double loo
 // Set position wrappers
 void setPosition(double x, double y);
 void setPosition(double x, double y, double t);
-double getDistanceActualBack();
-double getDistanceActualSide();
-double getDistanceActual(double hyp, double theta);
+double getDistanceActual(Distance sensor, bool use_theta, double failsafe);
 
 // Wait wrappers
 void pidWait(Wait type);

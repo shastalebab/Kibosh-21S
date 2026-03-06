@@ -4,6 +4,7 @@
 AutonMode autonMode = BRAIN;
 Coordinate currentPoint = {0, 0, 0};
 vector<Coordinate> autonPath = {};
+double angle_offset = 0;
 const double default_angles[7]{6.0, 11.25, 22.5, 45.0, 90.0, 135.0, 180.0};
 
 //
@@ -151,11 +152,26 @@ void setPosition(double x, double y, double t) {
 	autonPath.push_back(currentPoint);
 }
 
-double getDistanceActualBack() { return (distanceSensBack.get() / 25.4) + 7.5; }
-
-double getDistanceActualSide() { return (distanceSensSide.get() / 25.4) + 5.657; }
-
-double getDistanceActual(double hyp, double theta) { return hyp * cos(theta * M_PI / 180.0); }
+double getDistanceActual(Distance sensor, bool use_theta, double failsafe) {
+	double distance;
+	switch(sensor) {
+		case BACK:
+			if(!distanceSensBack.is_installed()) distance = failsafe;
+			else distance = (distanceSensBack.get() / 25.4) + 7.5;
+			break;
+		case RIGHT:
+			if(!distanceSensRight.is_installed()) distance = failsafe;
+			else distance = (distanceSensRight.get() / 25.4) + 6.2195;
+			break;
+		case LEFT:
+		default:
+			if(!distanceSensLeft.is_installed()) distance = failsafe;
+			else distance = (distanceSensLeft.get() / 25.4) + 5.657;
+			break;
+	}
+	if(use_theta) distance = fabs(distance * cos((chassis.odom_theta_get() - angle_offset) * M_PI / 180.0));
+	return distance;
+}
 
 //
 // Wait wrappers
@@ -255,7 +271,8 @@ void moveThroughPoints(vector<Coordinate> points, drive_directions direction, in
 			for(auto point : points) {
 				turnSet(getTheta({chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()}, point, direction), speed);
 				&point != &points.back() ? pidWait(CHAIN) : pidWait(WAIT);
-				driveSet((getDistance({chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()}, point) * (direction == rev ? -1 : 1)), speed, slew);
+				driveSet((getDistance({chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()}, point) * (direction == rev ? -1 : 1)), speed,
+						 slew);
 				if(&point != &points.back()) pidWait(CHAIN);
 			}
 			break;
@@ -302,7 +319,8 @@ void moveToPoint(Coordinate newpoint, drive_directions direction, int speed, boo
 		case PLAIN:
 			turnSet(getTheta({chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()}, newpoint, direction), speed);
 			pidWait(WAIT);
-			driveSet((getDistance({chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()}, newpoint) * (direction == rev ? -1 : 1)), speed, slew);
+			driveSet((getDistance({chassis.odom_x_get(), chassis.odom_y_get(), chassis.odom_theta_get()}, newpoint) * (direction == rev ? -1 : 1)), speed,
+					 slew);
 			break;
 		case ODOM:
 			currentPoint.t = getTheta({currentPoint.x, currentPoint.y}, newpoint, direction);

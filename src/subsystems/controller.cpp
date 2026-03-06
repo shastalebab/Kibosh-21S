@@ -104,6 +104,7 @@ void masterControllerTask() {
 			}
 			pros::delay(50);
 
+			/*
 			// Update temperature variables and print to controller
             tempDrive = 0;
             tempIntake = 0;
@@ -112,7 +113,7 @@ void masterControllerTask() {
 			for(auto motor : chassis.right_motors) tempDrive += motor.get_temperature();
 			tempDrive /= (chassis.left_motors.size() + chassis.right_motors.size());
 
-			tempIntake = (intakeFront.motors[0]->get_temperature() + intakeBack.motors[0]->get_temperature()) / 2;
+			tempIntake = (intake.motors[0]->get_temperature() + intake.motors[1]->get_temperature()) / 2;
 
 			if(tempDrive <= 30)
 				pros::c::controller_print(pros::E_CONTROLLER_MASTER, 0, 0, "drive: cool, %.0f°C     ", tempDrive);
@@ -132,6 +133,7 @@ void masterControllerTask() {
 
 			// Print selected auton to controller
 			pros::c::controller_print(pros::E_CONTROLLER_MASTER, 2, 0, (auton_sel.selector_name + "        ").c_str());
+			*/
 		}
 		pros::delay(50);
 	}
